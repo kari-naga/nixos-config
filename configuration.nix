@@ -78,6 +78,7 @@
     wofi
     pkgs.libsForQt5.dolphin
     pkgs.microsoft-edge
+    pkgs.gparted
     pkgs.sbctl
     pkgs.libva
     pkgs.nvidia-vaapi-driver
@@ -126,7 +127,9 @@
 
   # services.gnome.gnome-keyring.enable = lib.mkForce false;
   programs.zsh.enable = true;
-
+  programs.waybar.enable = true;
+  programs.nm-applet.enable = true;
+  
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [ "https://hyprland.cachix.org" ];
@@ -206,13 +209,10 @@
     xwayland.enable = true;
   };
 
+  swapDevices = lib.mkForce [ ];
+
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
-    # LIBVA_DRIVER_NAME = "nvidia";
-    # XDG_SESSION_TYPE = "wayland";
-    # GBM_BACKEND = "nvidia-drm";
-    # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
-    # WLR_NO_HARDWARE_CURSORS = "1";
   };
 
   environment.shellAliases = {

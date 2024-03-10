@@ -4,6 +4,8 @@
   home.stateVersion = "23.11";
   home.packages = [
     pkgs.vscode
+    pkgs.hyprpaper
+    pkgs.wl-clipboard
   ];
   programs.home-manager.enable = true;
   programs.zsh = {
@@ -46,6 +48,9 @@
     defaultCacheTtl = 1800;
     maxCacheTtl = 7200;
   };
+  programs.waybar = {
+    enable = true;
+  };
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -54,7 +59,7 @@
       "$fileManager" = "dolphin";
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
-      # "exec-once": "waybar & hyprpaper";
+      "exec-once" = "waybar & hyprpaper";
       # windowrulev2 = [
       #   "suppressevent maximize, class:.*"
       # ];
