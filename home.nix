@@ -66,7 +66,12 @@
       "$fileManager" = "dolphin";
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
-      "exec-once" = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 & waybar & hyprpaper";
+      "exec-once" = [
+        "xhost +SI:localuser:root"
+        "${pkgs.libsForQt5.polkit-kde-agent}/libexec/polkit-kde-authentication-agent-1"
+        "waybar"
+        "hyprpaper"
+      ];
       # windowrulev2 = [
       #   "suppressevent maximize, class:.*"
       # ];
