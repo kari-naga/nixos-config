@@ -4,6 +4,7 @@
   home.stateVersion = "23.11";
   home.packages = [
     pkgs.vscode
+    pkgs.waybar
     pkgs.hyprpaper
     pkgs.wl-clipboard
   ];
@@ -50,7 +51,13 @@
   };
   programs.waybar = {
     enable = true;
+    settings = {
+      mainBar = {
+        layer = "top";
+      };
+    };
   };
+  services.network-manager-applet.enable = true;
   wayland.windowManager.hyprland = {
     enable = true;
     settings = {
@@ -59,7 +66,7 @@
       "$fileManager" = "dolphin";
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
-      "exec-once" = "waybar & hyprpaper";
+      "exec-once" = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1 & waybar & hyprpaper";
       # windowrulev2 = [
       #   "suppressevent maximize, class:.*"
       # ];

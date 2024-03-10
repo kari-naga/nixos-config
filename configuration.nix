@@ -76,6 +76,7 @@
     gnupg
     kitty
     wofi
+    pkgs.xorg.xhost
     pkgs.libsForQt5.dolphin
     pkgs.microsoft-edge
     pkgs.gparted
@@ -127,8 +128,6 @@
 
   # services.gnome.gnome-keyring.enable = lib.mkForce false;
   programs.zsh.enable = true;
-  programs.waybar.enable = true;
-  programs.nm-applet.enable = true;
   
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
@@ -199,6 +198,7 @@
     jack.enable = true;
   };
 
+  security.polkit.enable = true;
   security.rtkit.enable = true;
   xdg.portal.wlr.enable = true;
   services.dbus.enable = true;
@@ -217,5 +217,6 @@
 
   environment.shellAliases = {
     "nix-switch" = "sudo -i nixos-rebuild switch --flake /home/atom/.dotfiles#FusionBolt";
+    "xroot-enable" = "xhost +SI:localuser:root";
   };
 }
