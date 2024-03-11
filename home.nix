@@ -51,9 +51,51 @@
   };
   programs.waybar = {
     enable = true;
+    style = ''
+      * {
+        border: none;
+        border-radius: 0;
+        font-family: Source Code Pro;
+        padding: 0 5px;
+      }
+      window#waybar {
+        background: #16191C;
+        color: #AAB2BF;
+      }
+      #workspaces button {
+        padding: 0 5px;
+      }
+    '';
     settings = {
       mainBar = {
         layer = "top";
+        position = "top";
+        height = 30;
+        modules-left = [
+          "hyprland/workspaces"
+          "wlr/taskbar"
+        ];
+        modules-center = [
+          "hyprland/window"
+        ];
+        modules-right = [
+          # "mpd"
+          "temperature"
+          "network"
+          "battery"
+          "clock"
+          "tray"
+        ];
+        "hyprland/workspaces" = {
+          all-outputs = true;
+        };
+        "battery" = {
+          "format" = "{capacity}% {icon}";
+          "format-icons" = [ "" "" "" "" "" ];
+        };
+        "clock" = {
+          "format-alt" = "{:%a, %d. %b  %H:%M}";
+        };
       };
     };
   };
@@ -67,10 +109,10 @@
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
       "exec-once" = [
-        "xhost +SI:localuser:root"
-        "${pkgs.libsForQt5.polkit-kde-agent}/libexec/polkit-kde-authentication-agent-1"
-        "waybar"
         "hyprpaper"
+        "waybar"
+        "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
+        "xhost +SI:localuser:root"
       ];
       # windowrulev2 = [
       #   "suppressevent maximize, class:.*"
