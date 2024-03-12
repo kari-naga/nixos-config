@@ -61,7 +61,7 @@ in
       SSH_AUTH_SOCK = "$(gpgconf --list-dirs agent-ssh-socket)";
     };
     shellAliases = {
-      "nix-switch" = "sudo -i nixos-rebuild switch --flake ${config.xdg.configHome}#FusionBolt";
+      "nix-switch" = "sudo -i nixos-rebuild switch --flake ${config.xdg.configHome}/dotfiles#FusionBolt";
     };
   };
   programs.git = {
