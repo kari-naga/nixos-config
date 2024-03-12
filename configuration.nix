@@ -10,14 +10,41 @@
       ./hardware-configuration.nix
     ];
 
-  # Bootloader.
-  boot.loader.systemd-boot.enable = lib.mkForce false;
+  # Bootloader
   boot.loader.efi.canTouchEfiVariables = true;
+  boot.loader.systemd-boot.enable = true;
 
-  boot.lanzaboote = {
-    enable = true;
-    pkiBundle = "/etc/secureboot";
-  };
+  # Lanzaboote
+  # boot.loader.systemd-boot.enable = lib.mkForce false;
+  # boot.lanzaboote = {
+  #   enable = true;
+  #   pkiBundle = "/etc/secureboot";
+  # };
+
+  boot.initrd.postDeviceCommands = lib.mkAfter ''
+    mkdir /btrfs_tmp
+    mount /dev/root_vg/root /btrfs_tmp
+    if [[ -e /btrfs_tmp/root ]]; then
+        mkdir -p /btrfs_tmp/old_roots
+        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+    fi
+
+    delete_subvolume_recursively() {
+        IFS=$'\n'
+        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+            delete_subvolume_recursively "/btrfs_tmp/$i"
+        done
+        btrfs subvolume delete "$1"
+    }
+
+    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+        delete_subvolume_recursively "$i"
+    done
+
+    btrfs subvolume create /btrfs_tmp/root
+    umount /btrfs_tmp
+  '';
 
   networking.hostName = config._module.args.hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -57,11 +84,16 @@
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.${config._module.args.username} = {
-    isNormalUser = true;
-    description = "Kari Naga";
-    extraGroups = [ "networkmanager" "wheel" ];
-    shell = pkgs.zsh;
+  users = {
+    mutableUsers = false;
+    users.${config._module.args.username} = {
+      isNormalUser = true;
+      description = "Kari Naga";
+      extraGroups = [ "networkmanager" "wheel" ];
+      hashedPasswordFile = "${config._module.args.persistent}/passwd/${config._module.args.username}.yescrypt";
+      shell = pkgs.zsh;
+    };
+    users.root.hashedPasswordFile = "${config._module.args.persistent}/passwd/root.yescrypt";
   };
 
   # Allow unfree packages
@@ -126,9 +158,10 @@
   services.gvfs.enable = true;
   services.udisks2.enable = true;
 
-  # services.gnome.gnome-keyring.enable = lib.mkForce false;
   programs.zsh.enable = true;
-  
+
+  fileSystems.${config._module.args.persistent}.neededForBoot = true;  
+
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
     substituters = [ "https://hyprland.cachix.org" ];
@@ -159,15 +192,18 @@
     libinput.enable = true;
   };
 
+  boot.resumeDevice = "/dev/nvme1n1p2";
+  systemd.sleep.extraConfig = ''
+    [Sleep]
+    HibernateMode=shutdown
+  '';
+  
   boot.kernelParams = [
     "i915.force_probe=7d55"
     "acpi_backlight=vendor"
+    "resume_offset=8922368"
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
-
-  # boot.extraModprobeConfig = ''
-  #   options i915 force_probe=7d55
-  # '';
 
   hardware.nvidia = {
     modesetting.enable = true;
@@ -209,14 +245,35 @@
     xwayland.enable = true;
   };
 
-  swapDevices = lib.mkForce [ ];
-
   environment.sessionVariables = {
     NIXOS_OZONE_WL = "1";
   };
 
-  environment.shellAliases = {
-    "nix-switch" = "sudo -i nixos-rebuild switch --flake /home/atom/.dotfiles#FusionBolt";
-    "xroot-enable" = "xhost +SI:localuser:root";
+  swapDevices = lib.mkForce [ { device = "/swap/swapfile"; } ];
+
+  programs.fuse.userAllowOther = true;
+
+  environment.persistence.${config._module.args.persistent} = {
+    hideMounts = true;
+    directories = [
+      "/var/log"
+      "/var/lib/systemd"
+      "/var/cache"
+      "/var/lib/bluetooth"
+      "/var/lib/nixos"
+      "/etc/NetworkManager/system-connections"
+    ];
+    files = [
+      "/etc/machine-id"
+    ];
+    users.${config._module.args.username} = {
+      directories = [
+        ".cache"
+        { directory = ".gnupg"; mode = "0700"; }
+        { directory = ".ssh"; mode = "0700"; }
+        ".local/share"
+        ".local/state"
+      ];
+    };
   };
 }
