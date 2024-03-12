@@ -51,7 +51,7 @@ in
     mimeApps = {
       enable = false;
       defaultApplications = {
-        "inode/directory" = "dolphin.desktop";
+        "inode/directory" = "nautilus.desktop";
       };
     };
     userDirs = {
@@ -131,4 +131,12 @@ in
     enable = true;
   };
   services.network-manager-applet.enable = true;
+  gtk = {
+    enable = true;
+    theme.name = "Adwaita-dark";
+  };
+  qt = {
+    enable = true;
+    platformTheme = "gtk3";
+  };
 }

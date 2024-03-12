@@ -110,9 +110,10 @@
     kitty
     wofi
     # pkgs.asusctl
-    # pkgs.brightnessctl
+    # pkgs.supergfxctl
+    pkgs.usbutils
     pkgs.xorg.xhost
-    pkgs.libsForQt5.dolphin
+    pkgs.gnome.nautilus
     pkgs.microsoft-edge
     pkgs.gparted
     pkgs.sbctl
@@ -160,12 +161,25 @@
   services.devmon.enable = true;
   services.gvfs.enable = true;
   services.udisks2.enable = true;
-  # services.asusd.enable = true;
-  # services.asusd.enableUserService = true;
+  services.asusd.enable = true;
+  services.asusd.enableUserService = true;
   services.gnome.gnome-keyring.enable = true;
 
   programs.zsh.enable = true;
   programs.light.enable = true;
+
+  # In progress (https://wiki.archlinux.org/title/Laptop/ASUS)
+  # systemd.services."battery-charge-threshold" = {
+  #   description = "Set the battery charge threshold";
+  #   after = [ "multi-user.target" ];
+  #   startLimitBurst = 0;
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     Restart = "on-failure";
+  #     ExecStart = "/bin/bash -c 'echo 80 > /sys/class/power_supply/BAT1/charge_control_end_threshold'";
+  #   };
+  #   wantedBy = [ "multi-user.target" ];
+  # };
 
   fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 

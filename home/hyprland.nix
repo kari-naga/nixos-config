@@ -6,7 +6,7 @@
     settings = {
       "$mainMod" = "SUPER";
       "$terminal" = "kitty";
-      "$fileManager" = "dolphin";
+      "$fileManager" = "nautilus";
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
       "exec-once" = [
@@ -126,7 +126,6 @@
       ];
       env = [
         "XCURSOR_SIZE,36"
-        "QT_QPA_PLATFORMTHEME,qt6ct"
         "LIBVA_DRIVER_NAME,nvidia"
         "XDG_SESSION_TYPE,wayland"
         "GBM_BACKEND,nvidia-drm"
