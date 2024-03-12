@@ -5,6 +5,8 @@
 - Load repo onto bootable NixOS installation media
 - Comment out Lanzaboote section and enable `systemd-boot`
 - Turn off secure boot and boot into installation media
+- Run `lsblk` and check the device name of the target storage (e.g. `nvme1n1`)
+  - Edit the `device` field in `disko-config.nix` and the target partition (append `p2` to the device name) under `boot.initrd.postDeviceCommands` in `configuration.nix` appropriately
 - Run `sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko [absolute path to repo]/disko-config.nix`
 - Use `mkpasswd -m yescrypt` to generate hashed password files for user and root
   - Place them in `/mnt/persistent/passwd` with names `[user].yescrypt`
