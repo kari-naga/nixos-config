@@ -47,13 +47,13 @@ in
   };
   xdg = {
     enable = true;
-    mime = {
-      enable = true;
+    mime.enable = true;
+    mimeApps = {
+      enable = false;
       defaultApplications = {
         "inode/directory" = "dolphin.desktop";
       };
     };
-    mimeApps.enable = false;
     userDirs = {
       enable = true;
       createDirectories = false;
@@ -71,7 +71,7 @@ in
       ZDOTDIR = "${configHome}/zsh";
     };
     shellAliases = {
-      "nix-switch" = "sudo -i nixos-rebuild switch --flake ${config.xdg.configHome}/dotfiles#FusionBolt";
+      "nix-switch" = "sudo -i nixos-rebuild switch --flake '${config.xdg.configHome}/dotfiles#FusionBolt'";
     };
     initExtra = ''
       function nvidia-offload {

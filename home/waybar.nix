@@ -47,7 +47,7 @@
         };
         battery = {
           format = "{capacity}% {icon}";
-          tooltip-format = "{power} - {timeTo}"
+          tooltip-format = "{power} - {timeTo}";
           format-icons = [ " " " " " " " " " " ];
         };
         clock = {

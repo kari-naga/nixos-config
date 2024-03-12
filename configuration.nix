@@ -90,7 +90,7 @@
     users.${config._module.args.username} = {
       isNormalUser = true;
       description = "Kari Naga";
-      extraGroups = [ "networkmanager" "wheel" ];
+      extraGroups = [ "networkmanager" "wheel" "video" ];
       hashedPasswordFile = "${config._module.args.persistent}/passwd/${config._module.args.username}.yescrypt";
       shell = pkgs.zsh;
     };
@@ -109,8 +109,8 @@
     gnupg
     kitty
     wofi
-    pkgs.asusctl
-    pkgs.brightnessctl
+    # pkgs.asusctl
+    # pkgs.brightnessctl
     pkgs.xorg.xhost
     pkgs.libsForQt5.dolphin
     pkgs.microsoft-edge
@@ -160,10 +160,12 @@
   services.devmon.enable = true;
   services.gvfs.enable = true;
   services.udisks2.enable = true;
-  services.asusd.enable = true;
-  services.asusd.enableUserService = true;
+  # services.asusd.enable = true;
+  # services.asusd.enableUserService = true;
+  services.gnome.gnome-keyring.enable = true;
 
   programs.zsh.enable = true;
+  programs.light.enable = true;
 
   fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 
