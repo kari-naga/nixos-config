@@ -35,6 +35,7 @@ in
       "${configHome}/Code"
       "${configHome}/hypr"
       "${configHome}/waybar"
+      "${configHome}/zsh"
       (strip config.xdg.userDirs.desktop)
       (strip config.xdg.userDirs.documents)
       (strip config.xdg.userDirs.music)
@@ -57,11 +58,30 @@ in
   };
   programs.zsh = {
     enable = true;
+    dotDir = "${configHome}/zsh";
     sessionVariables = {
       SSH_AUTH_SOCK = "$(gpgconf --list-dirs agent-ssh-socket)";
     };
     shellAliases = {
       "nix-switch" = "sudo -i nixos-rebuild switch --flake ${config.xdg.configHome}/dotfiles#FusionBolt";
+    };
+    initExtra = ''
+      function nvidia-offload {
+        export __NV_PRIME_RENDER_OFFLOAD=1
+        export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+        export __GLX_VENDOR_LIBRARY_NAME=nvidia
+        export __VK_LAYER_NV_optimus=NVIDIA_only
+        exec "$1"
+      }
+    '';
+    antidote = {
+      enable = true;
+      plugins = [
+        "ohmyzsh/ohmyzsh path:lib"
+        "zsh-users/zsh-autosuggestions"
+        "romkatv/powerlevel10k kind:fpath"
+        "zdharma-continuum/fast-syntax-highlighting kind:defer"
+      ];
     };
   };
   programs.git = {

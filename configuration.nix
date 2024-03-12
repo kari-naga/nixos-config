@@ -60,7 +60,8 @@
   networking.firewall.enable = true;
 
   # Set your time zone.
-  time.timeZone = "America/Detroit";
+  time.timeZone = "US/Eastern";
+  time.hardwareClockInLocalTime = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
@@ -217,6 +218,7 @@
         enable = true;
         enableOffloadCmd = true;
       };
+      # edit bus IDs as needed (sudo lshw -c display)
       intelBusId = "PCI:0:2:0";
       nvidiaBusId = "PCI:1:0:0";
     };
