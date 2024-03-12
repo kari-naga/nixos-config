@@ -38,7 +38,7 @@
               "${impermanence}/home-manager.nix"
               { _module = { inherit args; }; }
             ];
-            users.${username} = import ./home.nix;
+            users.${username} = import ./home;
           };
         }
         impermanence.nixosModules.impermanence

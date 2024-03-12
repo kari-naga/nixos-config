@@ -109,6 +109,8 @@
     gnupg
     kitty
     wofi
+    pkgs.asusctl
+    pkgs.brightnessctl
     pkgs.xorg.xhost
     pkgs.libsForQt5.dolphin
     pkgs.microsoft-edge
@@ -158,6 +160,8 @@
   services.devmon.enable = true;
   services.gvfs.enable = true;
   services.udisks2.enable = true;
+  services.asusd.enable = true;
+  services.asusd.enableUserService = true;
 
   programs.zsh.enable = true;
 
@@ -279,4 +283,8 @@
       ];
     };
   };
+
+  fonts.packages = with pkgs; [
+    (nerdfonts.override { fonts = [ "FiraCode" "JetBrainsMono" "Meslo" ]; })
+  ];
 }
