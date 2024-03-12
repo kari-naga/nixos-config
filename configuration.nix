@@ -160,7 +160,7 @@
 
   programs.zsh.enable = true;
 
-  fileSystems.${config._module.args.persistent}.neededForBoot = true;  
+  fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
@@ -262,6 +262,7 @@
       "/var/lib/bluetooth"
       "/var/lib/nixos"
       "/etc/NetworkManager/system-connections"
+      "/etc/secureboot"
     ];
     files = [
       "/etc/machine-id"
