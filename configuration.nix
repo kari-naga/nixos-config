@@ -103,26 +103,26 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-  #  vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    #  vim
     wget
     git
     gnupg
-    kitty
+    foot
     wofi
-    # pkgs.asusctl
-    # pkgs.supergfxctl
-    pkgs.usbutils
-    pkgs.xorg.xhost
-    pkgs.gnome.nautilus
-    pkgs.microsoft-edge
-    pkgs.gparted
-    pkgs.sbctl
-    pkgs.libva
-    pkgs.nvidia-vaapi-driver
-    pkgs.libsForQt5.qt5.qtwayland
-    pkgs.libsForQt5.qt5ct
-    pkgs.qt6.qtwayland
-    pkgs.qt6Packages.qt6ct
+    # asusctl
+    # supergfxctl
+    usbutils
+    xorg.xhost
+    gnome.nautilus
+    microsoft-edge
+    gparted
+    sbctl
+    libva
+    nvidia-vaapi-driver
+    libsForQt5.qt5.qtwayland
+    libsForQt5.qt5ct
+    qt6.qtwayland
+    qt6Packages.qt6ct
   ];
 
   # Some programs need SUID wrappers, can be configured further or are

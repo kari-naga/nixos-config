@@ -5,7 +5,7 @@
     enable = true;
     settings = {
       "$mainMod" = "SUPER";
-      "$terminal" = "kitty";
+      "$terminal" = "foot";
       "$fileManager" = "nautilus";
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto";
