@@ -5,11 +5,13 @@
   home.homeDirectory = homeDirectory;
   programs.home-manager.enable = true;
   home.stateVersion = "23.11";
-  home.packages = [
-    pkgs.vscode
-    pkgs.waybar
-    pkgs.hyprpaper
-    pkgs.wl-clipboard
+  home.packages = with pkgs; [
+    vscode
+    waybar
+    hyprpaper
+    wl-clipboard
+    nixpkgs-fmt
+    nil
   ];
   xdg = {
     enable = true;

@@ -14,6 +14,7 @@
       "${configHome}/zsh"
       "${configHome}/dunst"
       "${configHome}/rog"
+      "${configHome}/foot"
       (strip config.xdg.userDirs.desktop)
       (strip config.xdg.userDirs.documents)
       (strip config.xdg.userDirs.music)
