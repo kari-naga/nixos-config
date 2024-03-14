@@ -25,5 +25,8 @@ in
     ./waybar.nix
     ./persistent.nix
     ./zsh.nix
+    ./dunst.nix
+    ./foot.nix
+    ./wofi.nix
   ];
 }

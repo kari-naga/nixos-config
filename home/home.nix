@@ -12,13 +12,16 @@
     wl-clipboard
     nixpkgs-fmt
     nil
-    gradience
+    neofetch
+    alsa-utils
+    pavucontrol
+    htop
   ];
   xdg = {
     enable = true;
     mime.enable = true;
     mimeApps = {
-      enable = false;
+      enable = true;
       defaultApplications = {
         "inode/directory" = "org.gnome.Nautilus.desktop";
       };
@@ -62,14 +65,11 @@
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
-    pinentryFlavor = "qt";
+    pinentryFlavor = "gnome2";
     defaultCacheTtl = 1800;
     maxCacheTtl = 7200;
   };
   services.gnome-keyring.enable = true;
-  services.dunst = {
-    enable = true;
-  };
   services.network-manager-applet.enable = true;
   gtk = {
     enable = true;

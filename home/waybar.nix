@@ -3,19 +3,10 @@
 {
   programs.waybar = {
     enable = true;
-    style = ''
-      * {
-        border: none;
-        border-radius: 0;
-        padding: 0 5px;
-      }
-      window#waybar {
-        background: #16191C;
-        color: #AAB2BF;
-      }
-    '';
     settings = {
       mainBar = {
+        mode = "hide";
+        start_hidden = true;
         layer = "top";
         position = "top";
         height = 50;
@@ -47,14 +38,27 @@
         };
         battery = {
           format = "{capacity}% {icon}";
-          tooltip-format = "{power} - {timeTo}";
+          tooltip-format = "{timeTo}";
+          tooltip-format-charging = "Charging at {power}W - {timeTo}";
+          tooltip-format-discharging = "Discharging at {power}W - {timeTo}";
           format-icons = [ " " " " " " " " " " ];
         };
         clock = {
-          format = "{%I:%M %p}";
+          format = "{:%I:%M %p}";
           format-alt = "{:%a, %b %d  %I:%M %p}";
         };
       };
     };
+    style = ''
+      * {
+        border: none;
+        border-radius: 0;
+        padding: 0 5px;
+      }
+      window#waybar {
+        background: #16191C;
+        color: #AAB2BF;
+      }
+    '';
   };
 }

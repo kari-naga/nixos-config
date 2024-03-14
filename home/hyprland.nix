@@ -8,16 +8,18 @@
       "$terminal" = "foot";
       "$fileManager" = "nautilus";
       "$menu" = "wofi --show drun";
-      monitor = ",preferred,auto,auto";
+      monitor = ",preferred,auto,auto,bitdepth,10,vrr,1";
       "exec-once" = [
         "hyprpaper"
         "waybar"
         "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "xhost +SI:localuser:root"
+        "light -N 1"
+        "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
       ];
-      windowrulev2 = [
-        "suppressevent maximize, class:.*"
-      ];
+      # windowrulev2 = [
+      #   "suppressevent maximize, class:.*"
+      # ];
       input = {
         kb_layout = "us";
         kb_variant = "";
@@ -76,7 +78,19 @@
       misc = {
         force_default_wallpaper = -1;
       };
+      bindle = [
+        ", XF86MonBrightnessUp, exec, light -A 10"
+        ", XF86MonBrightnessDown, exec, light -U 10"
+        ", XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 10%+"
+        ", XF86AudioLowerVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 10%-"
+      ];
+      bindi = [
+        ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+      ];
       bind = [
+        "$mainMod, space, exec, pkill -SIGUSR1 waybar"
+        # Basic commands
         "$mainMod, C, killactive,"
         "$mainMod, M, exit,"
         "$mainMod, V, togglefloating,"
@@ -85,8 +99,8 @@
         "$mainMod, Q, exec, $terminal"
         "$mainMod, E, exec, $fileManager"
         "$mainMod, R, exec, $menu"
-        "$mainMod, F, fullscreen,"
-        "$mainMod SHIFT, F, fullscreen, 1"
+        "$mainMod, F, fullscreen, 1"
+        "$mainMod SHIFT, F, fullscreen,"
         # Move focus with mainMod + arrow keys
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"

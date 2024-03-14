@@ -46,6 +46,48 @@
     umount /btrfs_tmp
   '';
 
+  # boot.initrd.systemd.services.wipe-root = {
+  #   description = "Wipe root filesystem on boot";
+  #   wantedBy = [
+  #     "initrd.target"
+  #   ];
+  #   after = [
+  #     "initrd-root-device.target"
+  #   ];
+  #   before = [
+  #     "sysroot.mount"
+  #   ];
+  #   path = with pkgs; [
+  #     btrfs-progs
+  #   ];
+  #   unitConfig.DefaultDependencies = "no";
+  #   serviceConfig.Type = "oneshot";
+  #   script = ''
+  #     mkdir /btrfs_tmp
+  #     mount /dev/nvme1n1p2 /btrfs_tmp
+  #     if [[ -e /btrfs_tmp/root ]]; then
+  #         mkdir -p /btrfs_tmp/old_roots
+  #         timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+  #         mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+  #     fi
+
+  #     delete_subvolume_recursively() {
+  #         IFS=$'\n'
+  #         for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+  #             delete_subvolume_recursively "/btrfs_tmp/$i"
+  #         done
+  #         btrfs subvolume delete "$1"
+  #     }
+
+  #     for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+  #         delete_subvolume_recursively "$i"
+  #     done
+
+  #     btrfs subvolume create /btrfs_tmp/root
+  #     umount /btrfs_tmp
+  #   '';
+  # };
+
   networking.hostName = config._module.args.hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.wireless.userControlled.enable = true;
@@ -169,17 +211,17 @@
   programs.light.enable = true;
 
   # In progress (https://wiki.archlinux.org/title/Laptop/ASUS)
-  # systemd.services."battery-charge-threshold" = {
-  #   description = "Set the battery charge threshold";
-  #   after = [ "multi-user.target" ];
-  #   startLimitBurst = 0;
-  #   serviceConfig = {
-  #     Type = "oneshot";
-  #     Restart = "on-failure";
-  #     ExecStart = "/bin/bash -c 'echo 80 > /sys/class/power_supply/BAT1/charge_control_end_threshold'";
-  #   };
-  #   wantedBy = [ "multi-user.target" ];
-  # };
+  systemd.services."battery-charge-threshold" = {
+    description = "Set the battery charge threshold";
+    after = [ "multi-user.target" ];
+    startLimitBurst = 0;
+    serviceConfig = {
+      Type = "oneshot";
+      Restart = "on-failure";
+      ExecStart = "/run/current-system/sw/bin/bash -c 'echo 80 > /sys/class/power_supply/BAT1/charge_control_end_threshold'";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
 
   fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 
@@ -228,17 +270,35 @@
   '';
   
   boot.kernelParams = [
+    "quiet"
+    "splash"
+    "loglevel=3"
+    "systemd.show_status=auto"
+    "rd.udev.log_level=3"
+    "udev.log_level=3"
+    "rd.systemd.show_status=false"
+    "udev.log_priority=3"
+    "boot.shell_on_fail"
     "i915.force_probe=7d55"
     "acpi_backlight=native"
     "i915.enable_dpcd_backlight=1"
     "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
+  boot.consoleLogLevel = 0;
+  boot.initrd.verbose = false;
+  boot.loader.timeout = 3;
+  boot.plymouth.enable = true;
+  # boot.initrd.systemd.enable = true;
+
+  boot.extraModprobeConfig = ''
+    options snd-hda-intel model=asus-zenbook
+  '';
 
   hardware.nvidia = {
     modesetting.enable = true;
-    powerManagement.enable = false;
-    powerManagement.finegrained = false;
+    powerManagement.enable = true;
+    powerManagement.finegrained = true;
     open = false;
     nvidiaSettings = true;
     package = config.boot.kernelPackages.nvidiaPackages.stable;
@@ -253,7 +313,8 @@
     };
   };
 
-  sound.enable = true;
+  sound.enable = false;
+  sound.mediaKeys.enable = false;
   services.pipewire = {
     enable = true;
     audio.enable = true;
