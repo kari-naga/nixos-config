@@ -46,48 +46,6 @@
     umount /btrfs_tmp
   '';
 
-  # boot.initrd.systemd.services.wipe-root = {
-  #   description = "Wipe root filesystem on boot";
-  #   wantedBy = [
-  #     "initrd.target"
-  #   ];
-  #   after = [
-  #     "initrd-root-device.target"
-  #   ];
-  #   before = [
-  #     "sysroot.mount"
-  #   ];
-  #   path = with pkgs; [
-  #     btrfs-progs
-  #   ];
-  #   unitConfig.DefaultDependencies = "no";
-  #   serviceConfig.Type = "oneshot";
-  #   script = ''
-  #     mkdir /btrfs_tmp
-  #     mount /dev/nvme1n1p2 /btrfs_tmp
-  #     if [[ -e /btrfs_tmp/root ]]; then
-  #         mkdir -p /btrfs_tmp/old_roots
-  #         timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-  #         mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-  #     fi
-
-  #     delete_subvolume_recursively() {
-  #         IFS=$'\n'
-  #         for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-  #             delete_subvolume_recursively "/btrfs_tmp/$i"
-  #         done
-  #         btrfs subvolume delete "$1"
-  #     }
-
-  #     for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
-  #         delete_subvolume_recursively "$i"
-  #     done
-
-  #     btrfs subvolume create /btrfs_tmp/root
-  #     umount /btrfs_tmp
-  #   '';
-  # };
-
   networking.hostName = config._module.args.hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   # networking.wireless.userControlled.enable = true;
@@ -275,24 +233,29 @@
     HibernateMode=shutdown
   '';
   
+  # boot.consoleLogLevel = 0;
+  # boot.initrd.verbose = false;
+  # boot.plymouth.enable = true;
   boot.kernelParams = [
-    "quiet"
-    "splash"
-    "rd.udev.log_level=3"
-    "rd.systemd.show_status=false"
-    "udev.log_priority=3"
-    "boot.shell_on_fail"
+    # Silent boot
+    # "quiet"
+    # "splash"
+    # "loglevel=3"
+    # "systemd.show_status=auto"
+    # "rd.systemd.show_status=auto"
+    # "udev.log_level=3"
+    # "rd.udev.log_level=3"
+    # "udev.log_priority=3"
+    # "rd.udev.log_priority=3"
+    # "boot.shell_on_fail"
+    # General params
     "i915.force_probe=7d55"
     "acpi_backlight=native"
     "i915.enable_dpcd_backlight=1"
     "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
-  boot.consoleLogLevel = 0;
-  boot.initrd.verbose = false;
   boot.loader.timeout = 3;
-  boot.plymouth.enable = true;
-  # boot.initrd.systemd.enable = true;
 
   # boot.extraModprobeConfig = ''
   #   options snd-hda-intel model=asus-zenbook
