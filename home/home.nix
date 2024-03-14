@@ -12,6 +12,7 @@
     wl-clipboard
     nixpkgs-fmt
     nil
+    gradience
   ];
   xdg = {
     enable = true;
@@ -19,12 +20,12 @@
     mimeApps = {
       enable = false;
       defaultApplications = {
-        "inode/directory" = "nautilus.desktop";
+        "inode/directory" = "org.gnome.Nautilus.desktop";
       };
     };
     userDirs = {
       enable = true;
-      createDirectories = false;
+      createDirectories = true;
     };
   };
   systemd.user.services = {
@@ -72,10 +73,16 @@
   services.network-manager-applet.enable = true;
   gtk = {
     enable = true;
-    theme.name = "Adwaita-dark";
+    theme.name = "adwaita-dark";
+  };
+  dconf.settings = {
+    "org/gnome/desktop/interface" = {
+      color-scheme = "prefer-dark";
+    };
   };
   qt = {
     enable = true;
-    platformTheme = "gtk3";
+    platformTheme = "gnome";
+    style.name = "adwaita-dark";
   };
 }

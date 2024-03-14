@@ -189,6 +189,13 @@
     trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
   };
 
+  nix.optimise.automatic = true;
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
   hardware.opengl = {
     enable = true;
     driSupport = true;
@@ -213,6 +220,7 @@
     libinput.enable = true;
   };
 
+  # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
   boot.resumeDevice = "/dev/nvme1n1p2";
   systemd.sleep.extraConfig = ''
     [Sleep]
@@ -221,8 +229,9 @@
   
   boot.kernelParams = [
     "i915.force_probe=7d55"
-    "acpi_backlight=vendor"
-    "resume_offset=8922368"
+    "acpi_backlight=native"
+    "i915.enable_dpcd_backlight=1"
+    "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
     "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
   ];
 
@@ -255,6 +264,10 @@
     };
     jack.enable = true;
   };
+
+  security.sudo.extraConfig = ''
+    Defaults lecture = never
+  '';
 
   security.polkit.enable = true;
   security.rtkit.enable = true;

@@ -15,9 +15,9 @@
         "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "xhost +SI:localuser:root"
       ];
-      # windowrulev2 = [
-      #   "suppressevent maximize, class:.*"
-      # ];
+      windowrulev2 = [
+        "suppressevent maximize, class:.*"
+      ];
       input = {
         kb_layout = "us";
         kb_variant = "";
@@ -85,6 +85,8 @@
         "$mainMod, Q, exec, $terminal"
         "$mainMod, E, exec, $fileManager"
         "$mainMod, R, exec, $menu"
+        "$mainMod, F, fullscreen,"
+        "$mainMod SHIFT, F, fullscreen, 1"
         # Move focus with mainMod + arrow keys
         "$mainMod, left, movefocus, l"
         "$mainMod, right, movefocus, r"

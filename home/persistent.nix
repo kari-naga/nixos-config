@@ -15,11 +15,17 @@
       "${configHome}/dunst"
       "${configHome}/rog"
       "${configHome}/foot"
-      (strip config.xdg.userDirs.desktop)
-      (strip config.xdg.userDirs.documents)
-      (strip config.xdg.userDirs.music)
-      (strip config.xdg.userDirs.pictures)
-      (strip config.xdg.userDirs.videos)
+      "${configHome}/gtk-3.0"
+      "${configHome}/gtk-4.0"
+    ] ++ map (directory: {
+      directory = strip directory;
+      method = "symlink";
+    }) [
+      config.xdg.userDirs.desktop
+      config.xdg.userDirs.documents
+      config.xdg.userDirs.music
+      config.xdg.userDirs.pictures
+      config.xdg.userDirs.videos
     ];
   };
 }
