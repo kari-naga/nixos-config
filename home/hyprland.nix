@@ -141,7 +141,7 @@
         "$mainMod, mouse:273, resizewindow"
       ];
       env = [
-        "XCURSOR_SIZE,36"
+        "XCURSOR_SIZE,24"
         "LIBVA_DRIVER_NAME,nvidia"
         "XDG_SESSION_TYPE,wayland"
         "GBM_BACKEND,nvidia-drm"

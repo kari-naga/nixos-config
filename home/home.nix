@@ -9,6 +9,9 @@
     vscode
     waybar
     hyprpaper
+    hyprpicker
+    hypridle
+    hyprlock
     wl-clipboard
     nixpkgs-fmt
     nil
@@ -30,6 +33,18 @@
       enable = true;
       createDirectories = true;
     };
+    # portal = {
+    #   enable = true;
+    #   extraPortals = [
+    #     pkgs.xdg-desktop-portal-gtk
+    #   ];
+    #   config = {
+    #     preferred = {
+    #       default = "hyprland;gtk";
+    #       "org.freedesktop.appearance.color-scheme" = 1;
+    #     };
+    #   };
+    # };
   };
   systemd.user.services = {
     "app-backintime@autostart".Service.ExecStart = pkgs.writeShellScript "no-op" "";
@@ -73,11 +88,14 @@
   services.network-manager-applet.enable = true;
   gtk = {
     enable = true;
-    theme.name = "adwaita-dark";
+    theme.name = "Adwaita:dark";
   };
-  dconf.settings = {
-    "org/gnome/desktop/interface" = {
-      color-scheme = "prefer-dark";
+  dconf = {
+    enable = true;
+    settings = {
+      "org/gnome/desktop/interface" = {
+        color-scheme = "prefer-dark";
+      };
     };
   };
   qt = {

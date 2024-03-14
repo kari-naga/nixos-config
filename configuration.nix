@@ -165,6 +165,8 @@
     libsForQt5.qt5ct
     qt6.qtwayland
     qt6Packages.qt6ct
+    gnome.adwaita-icon-theme
+    xdg-desktop-portal-gtk
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -209,6 +211,7 @@
 
   programs.zsh.enable = true;
   programs.light.enable = true;
+  programs.dconf.enable = true;
 
   # In progress (https://wiki.archlinux.org/title/Laptop/ASUS)
   systemd.services."battery-charge-threshold" = {
@@ -222,6 +225,9 @@
     };
     wantedBy = [ "multi-user.target" ];
   };
+  powerManagement.resumeCommands = ''
+    echo 80 > /sys/class/power_supply/BAT0/charge_control_end_threshold
+  '';
 
   fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 
@@ -291,9 +297,9 @@
   boot.plymouth.enable = true;
   # boot.initrd.systemd.enable = true;
 
-  boot.extraModprobeConfig = ''
-    options snd-hda-intel model=asus-zenbook
-  '';
+  # boot.extraModprobeConfig = ''
+  #   options snd-hda-intel model=asus-zenbook
+  # '';
 
   hardware.nvidia = {
     modesetting.enable = true;

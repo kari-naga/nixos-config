@@ -5,7 +5,7 @@
     enable = true;
     iconTheme = {
       name = "Adwaita";
-      size = "128x128";
+      # size = "128x128";
       package = pkgs.gnome.adwaita-icon-theme;
     };
     settings = {
@@ -57,7 +57,7 @@
         class = "Dunst";
         corner_radius = 15;
         ignore_dbusclose = false;
-        layer = "bottom";
+        layer = "top";
         force_xwayland = false;
         force_xinerama = false;
         mouse_left_click = "close_current";

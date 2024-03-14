@@ -5,7 +5,6 @@
     enable = true;
     settings = {
       mainBar = {
-        mode = "hide";
         start_hidden = true;
         layer = "top";
         position = "top";
