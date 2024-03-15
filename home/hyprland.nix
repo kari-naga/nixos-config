@@ -10,12 +10,13 @@
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto,bitdepth,10,vrr,1";
       "exec-once" = [
-        "hyprpaper"
-        "waybar"
         "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "xhost +SI:localuser:root"
-        "light -N 1"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
+        "asusctl led-pow-2 keyboard"
+        "light -N 1"
+        "hyprpaper"
+        "waybar"
       ];
       # windowrulev2 = [
       #   "suppressevent maximize, class:.*"

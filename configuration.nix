@@ -21,30 +21,99 @@
     pkiBundle = "/etc/secureboot";
   };
 
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    mkdir /btrfs_tmp
-    mount /dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51 /btrfs_tmp # change if necessary
-    if [[ -e /btrfs_tmp/root ]]; then
-        mkdir -p /btrfs_tmp/old_roots
-        timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
-        mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
-    fi
+  boot.initrd.supportedFilesystems = [ "btrfs" ];
+  boot.initrd.systemd = {
+    enable = true;
+    emergencyAccess = true;
+    initrdBin = with pkgs; [
+      coreutils
+      btrfs-progs
+    ];
+    services.initrd-root-wipe = {
+      description = "Wipe root on boot";
+      wantedBy = [
+        "initrd-root-fs.target"
+        "initrd.target"
+      ];
+      requires = [
+        # "systemd-cryptsetup@{hostname}.service"
+        "dev-disk-by\\x2did-nvme\\x2dHFS002TEJ9X101N_AJCCN53941470CM51\\x2dpart2.device"
+        "initrd-root-device.target"
+      ];
+      after = [
+        # "systemd-cryptsetup@{hostname}.service"
+        "dev-disk-by\\x2did-nvme\\x2dHFS002TEJ9X101N_AJCCN53941470CM51\\x2dpart2.device"
+        "initrd-root-device.target"
+      ];
+      before = [ 
+        "sysroot.mount"
+      ];
+      unitConfig.DefaultDependencies = "no";
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = "yes";
+      };
+      script = ''
+        mkdir -p /btrfs_tmp
+        mount /dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51-part2 /btrfs_tmp # change if necessary
+        if [[ -e /btrfs_tmp/root ]]; then
+            mkdir -p /btrfs_tmp/old_roots
+            timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
+            mv /btrfs_tmp/root "/btrfs_tmp/old_roots/$timestamp"
+        fi
 
-    delete_subvolume_recursively() {
-        IFS=$'\n'
-        for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
-            delete_subvolume_recursively "/btrfs_tmp/$i"
+        delete_subvolume_recursively() {
+            IFS=$'\n'
+            for i in $(btrfs subvolume list -o "$1" | cut -f 9- -d ' '); do
+                delete_subvolume_recursively "/btrfs_tmp/$i"
+            done
+            btrfs subvolume delete "$1"
+        }
+
+        for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
+            delete_subvolume_recursively "$i"
         done
-        btrfs subvolume delete "$1"
-    }
 
-    for i in $(find /btrfs_tmp/old_roots/ -maxdepth 1 -mtime +30); do
-        delete_subvolume_recursively "$i"
-    done
+        btrfs subvolume create /btrfs_tmp/root
+        umount /btrfs_tmp
+      '';
+    };
+  };
 
-    btrfs subvolume create /btrfs_tmp/root
-    umount /btrfs_tmp
+  # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
+  boot.resumeDevice = "/dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51-part2";
+  systemd.sleep.extraConfig = ''
+    [Sleep]
+    HibernateMode=shutdown
   '';
+  
+  boot.consoleLogLevel = 0;
+  boot.initrd.verbose = false;
+  boot.plymouth.enable = true;
+  boot.kernelParams = [
+    # Silent boot
+    "quiet"
+    "splash"
+    "loglevel=3"
+    "systemd.show_status=auto"
+    "rd.systemd.show_status=auto"
+    "udev.log_level=3"
+    "rd.udev.log_level=3"
+    "udev.log_priority=3"
+    "rd.udev.log_priority=3"
+    "boot.shell_on_fail"
+    # General params
+    "i915.force_probe=7d55"
+    "acpi_backlight=native"
+    "i915.enable_dpcd_backlight=1"
+    "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
+    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
+  ];
+  boot.loader.timeout = 3;
+
+  # boot.extraModprobeConfig = ''
+  #   options snd-hda-intel model=asus-zenbook
+  # '';
 
   networking.hostName = config._module.args.hostname; # Define your hostname.
   # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
@@ -61,7 +130,6 @@
 
   # Set your time zone.
   time.timeZone = "US/Eastern";
-  time.hardwareClockInLocalTime = true;
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
@@ -114,6 +182,7 @@
     usbutils
     xorg.xhost
     gnome.nautilus
+    gnome.seahorse
     microsoft-edge
     gparted
     sbctl
@@ -123,9 +192,17 @@
     libsForQt5.qt5ct
     qt6.qtwayland
     qt6Packages.qt6ct
-    gnome.adwaita-icon-theme
     xdg-desktop-portal-gtk
+    gnome.gnome-themes-extra
+    gnome.adwaita-icon-theme
+    gnomeExtensions.appindicator
+    smartmontools
   ];
+
+  services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
+
+  services.dbus.enable = true;
+  services.dbus.packages = [ pkgs.gcr ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -226,41 +303,6 @@
     libinput.enable = true;
   };
 
-  # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
-  boot.resumeDevice = "/dev/nvme1n1p2";
-  systemd.sleep.extraConfig = ''
-    [Sleep]
-    HibernateMode=shutdown
-  '';
-  
-  # boot.consoleLogLevel = 0;
-  # boot.initrd.verbose = false;
-  # boot.plymouth.enable = true;
-  boot.kernelParams = [
-    # Silent boot
-    # "quiet"
-    # "splash"
-    # "loglevel=3"
-    # "systemd.show_status=auto"
-    # "rd.systemd.show_status=auto"
-    # "udev.log_level=3"
-    # "rd.udev.log_level=3"
-    # "udev.log_priority=3"
-    # "rd.udev.log_priority=3"
-    # "boot.shell_on_fail"
-    # General params
-    "i915.force_probe=7d55"
-    "acpi_backlight=native"
-    "i915.enable_dpcd_backlight=1"
-    "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-  ];
-  boot.loader.timeout = 3;
-
-  # boot.extraModprobeConfig = ''
-  #   options snd-hda-intel model=asus-zenbook
-  # '';
-
   hardware.nvidia = {
     modesetting.enable = true;
     powerManagement.enable = true;
@@ -299,7 +341,6 @@
   security.polkit.enable = true;
   security.rtkit.enable = true;
   xdg.portal.wlr.enable = true;
-  services.dbus.enable = true;
 
   programs.hyprland = {
     enable = true;

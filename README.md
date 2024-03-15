@@ -6,8 +6,8 @@
   - Can make secure boot compatible media by first flashing NixOS installer ISO then copying `bootx64.efi`, `grubx64.efi`, and `mmx64.efi` from a signed ISO (e.g. Fedora installer) into `EFI/boot`, replacing any existing files
 - Comment out Lanzaboote section and enable `systemd-boot`
 - Turn off secure boot and boot into installation media
-- Run `lsblk` and check the device name of the target storage (e.g. `nvme1n1`)
-  - Edit the `device` field in `disko-config.nix` and the target partition (append `p2` to the device name) under `boot.initrd.postDeviceCommands` in `configuration.nix` appropriately
+- Run `ls /dev/disk/by-id` and check the device name of the target storage (e.g. `nvme-HFS002TEJ9X101N_AJCCN53941470CM51`)
+  - Edit the `device` field in `disko-config.nix` and the target partition (append `-part2` to the device name) under `boot.initrd.postDeviceCommands` in `configuration.nix` appropriately
 - Run `sudo lshw -c display` and change the bus IDs for Nvidia Prime in `configuration.nix`
   - Remove leading zeroes, convert from hexadecimal to decimal, and replace periods with colons
   - Only last three numbers needed
