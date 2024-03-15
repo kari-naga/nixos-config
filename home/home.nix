@@ -33,18 +33,6 @@
       enable = true;
       createDirectories = true;
     };
-    # portal = {
-    #   enable = true;
-    #   extraPortals = [
-    #     pkgs.xdg-desktop-portal-gtk
-    #   ];
-    #   config = {
-    #     preferred = {
-    #       default = "hyprland;gtk";
-    #       "org.freedesktop.appearance.color-scheme" = 1;
-    #     };
-    #   };
-    # };
   };
   systemd.user.services = {
     "app-backintime@autostart".Service.ExecStart = pkgs.writeShellScript "no-op" "";
@@ -89,6 +77,12 @@
   gtk = {
     enable = true;
     theme.name = "Adwaita:dark";
+    gtk2.extraConfig = ''
+      gtk-application-prefer-dark-theme = true
+    '';
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
   };
   dconf = {
     enable = true;

@@ -23,7 +23,7 @@
 
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     mkdir /btrfs_tmp
-    mount /dev/nvme1n1p2 /btrfs_tmp # change if necessary
+    mount /dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51 /btrfs_tmp # change if necessary
     if [[ -e /btrfs_tmp/root ]]; then
         mkdir -p /btrfs_tmp/old_roots
         timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
@@ -339,6 +339,10 @@
       ];
     };
   };
+
+  # boot.initrd.postMountCommands = lib.mkBefore ''
+  #   ln -snfT ${config._module.args.persistent}/etc/machine-id /etc/machine-id
+  # '';
 
   fonts.packages = with pkgs; [
     (nerdfonts.override { fonts = [ "FiraCode" "JetBrainsMono" "Meslo" ]; })
