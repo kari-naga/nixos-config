@@ -10,12 +10,12 @@
       "$menu" = "wofi --show drun";
       monitor = ",preferred,auto,auto,bitdepth,10,vrr,1";
       "exec-once" = [
+        "waypaper --restore --random"
         "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1"
         "xhost +SI:localuser:root"
         "dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP"
         "asusctl led-pow-2 keyboard"
         "light -N 1"
-        "hyprpaper"
         "waybar"
       ];
       # windowrulev2 = [
@@ -77,7 +77,7 @@
         workspace_swipe = false;
       };
       misc = {
-        force_default_wallpaper = -1;
+        force_default_wallpaper = 0;
       };
       bindle = [
         ", XF86MonBrightnessUp, exec, light -A 10"
@@ -93,7 +93,7 @@
         "$mainMod, space, exec, pkill -SIGUSR1 waybar"
         # Basic commands
         "$mainMod, C, killactive,"
-        "$mainMod, M, exit,"
+        "$mainMod SHIFT, M, exit,"
         "$mainMod, V, togglefloating,"
         "$mainMod, P, pseudo,"
         "$mainMod, J, togglesplit,"

@@ -28,5 +28,6 @@ in
     ./dunst.nix
     ./foot.nix
     ./wofi.nix
+    ./waypaper.nix
   ];
 }

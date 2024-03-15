@@ -6,19 +6,31 @@
   programs.home-manager.enable = true;
   home.stateVersion = "23.11";
   home.packages = with pkgs; [
-    vscode
+    foot
+    wofi
     waybar
-    hyprpaper
+    swww
+    waypaper
     hyprpicker
     hypridle
     hyprlock
     wl-clipboard
+    microsoft-edge
+    gparted
+    vscode
     nixpkgs-fmt
     nil
     neofetch
     alsa-utils
     pavucontrol
     htop
+    gnome.nautilus
+    gnome.seahorse
+    gnome.gnome-system-monitor
+    gnome.totem
+    loupe
+    smartmontools
+    psensor
   ];
   xdg = {
     enable = true;

@@ -87,9 +87,12 @@
     HibernateMode=shutdown
   '';
   
+  boot.plymouth = {
+    enable = true;
+    theme = "breeze";
+  };
   boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
-  boot.plymouth.enable = true;
   boot.kernelParams = [
     # Silent boot
     "quiet"
@@ -171,32 +174,20 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    #  vim
     wget
     git
     gnupg
-    foot
-    wofi
-    # asusctl
-    # supergfxctl
     usbutils
     xorg.xhost
-    gnome.nautilus
-    gnome.seahorse
-    microsoft-edge
-    gparted
     sbctl
     libva
     nvidia-vaapi-driver
     libsForQt5.qt5.qtwayland
-    libsForQt5.qt5ct
     qt6.qtwayland
-    qt6Packages.qt6ct
     xdg-desktop-portal-gtk
     gnome.gnome-themes-extra
     gnome.adwaita-icon-theme
-    gnomeExtensions.appindicator
-    smartmontools
+    where-is-my-sddm-theme
   ];
 
   services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
@@ -298,7 +289,12 @@
         enable = true;
         wayland.enable = true;
         enableHidpi = true;
+        theme = "where_is_my_sddm_theme";
       };
+      # gdm = {
+      #   enable = true;
+      #   wayland = true;
+      # };
     };
     libinput.enable = true;
   };

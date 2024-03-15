@@ -15,8 +15,7 @@
       "${configHome}/dunst"
       "${configHome}/rog"
       "${configHome}/foot"
-      # "${configHome}/gtk-3.0"
-      # "${configHome}/gtk-4.0"
+      "${configHome}/waypaper"
     ] ++ map (directory: {
       directory = strip directory;
       method = "symlink";
