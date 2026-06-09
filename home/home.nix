@@ -4,109 +4,57 @@
   home.username = config._module.args.username;
   home.homeDirectory = homeDirectory;
   programs.home-manager.enable = true;
-  home.stateVersion = "23.11";
-  home.packages = with pkgs; [
-    foot
-    wofi
-    waybar
-    swww
-    waypaper
-    hyprpicker
-    hypridle
-    hyprlock
-    wl-clipboard
-    microsoft-edge
-    gparted
-    vscode
-    nixpkgs-fmt
-    nil
-    neofetch
-    alsa-utils
-    pavucontrol
-    htop
-    gnome.nautilus
-    gnome.seahorse
-    gnome.gnome-system-monitor
-    gnome.totem
-    loupe
-    smartmontools
-    psensor
-  ];
+  
   xdg = {
     enable = true;
     mime.enable = true;
     mimeApps = {
       enable = true;
-      defaultApplications = {
-        "inode/directory" = "org.gnome.Nautilus.desktop";
-      };
     };
     userDirs = {
       enable = true;
       createDirectories = true;
     };
   };
-  systemd.user.services = {
-    "app-backintime@autostart".Service.ExecStart = pkgs.writeShellScript "no-op" "";
-    "app-picom@autostart".Service.ExecStart = pkgs.writeShellScript "no-op" "";
-  };
+
   programs.git = {
     enable = true;
-    userName = "Kari Naga";
-    userEmail = "4119937+kari-naga@users.noreply.github.com";
     lfs.enable = true;
-    extraConfig = {
+    settings = {
+      user.name = "Kari Naga";
+      user.email = "4119937+kari-naga@users.noreply.github.com";
       init.defaultBranch = "main";
       pull.rebase = true;
       push.autoSetupRemote = true;
-      commit.gpgsign = true;
-      gpg.format = "ssh";
-      user.signingKey = "~/.ssh/id_ed25519.pub";
-      credential = {
-        helper = "${pkgs.git-credential-manager}/bin/git-credential-manager";
-        credentialStore = "gpg";
+      gpg = {
+        format = "ssh";
+      };
+      "gpg \"ssh\"" = {
+        program = "${lib.getExe' pkgs._1password-gui "op-ssh-sign"}";
+      };
+      commit = {
+        gpgsign = true;
+      };
+      user = {
+        signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA1TB1eyN2NcLI/DhHmA6gxmY4W/+VXtMt29bDpp2jdq";
       };
     };
-    aliases = {
-      a = "add --all";
-      tree = "log --graph --decorate --pretty=oneline --abbrev-commit";
-    };
   };
+
   programs.ssh = {
     enable = true;
-    addKeysToAgent = "yes";
-  };
-  programs.gpg.enable = true;
-  services.gpg-agent = {
-    enable = true;
-    enableSshSupport = true;
-    pinentryPackage = pkgs.pinentry-gnome3;
-    defaultCacheTtl = 1800;
-    maxCacheTtl = 7200;
-  };
-  services.gnome-keyring.enable = true;
-  services.network-manager-applet.enable = true;
-  gtk = {
-    enable = true;
-    theme.name = "Adwaita:dark";
-    gtk2.extraConfig = ''
-      gtk-application-prefer-dark-theme = true
+    extraConfig = ''
+      Host *
+          IdentityAgent ${config.home.homeDirectory}/.1password/agent.sock
     '';
-    gtk3.extraConfig = {
-      gtk-application-prefer-dark-theme = true;
-    };
   };
-  dconf = {
-    enable = true;
-    settings = {
-      "org/gnome/desktop/interface" = {
-        color-scheme = "prefer-dark";
-      };
-    };
-  };
-  qt = {
-    enable = true;
-    platformTheme = "gnome";
-    style.name = "adwaita-dark";
-  };
+
+  # This value determines the Home Manager release that your configuration is
+  # compatible with. This helps avoid breakage when a new Home Manager release
+  # introduces backwards incompatible changes.
+  #
+  # You should not change this value, even if you update Home Manager. If you do
+  # want to update the value, then make sure to first check the Home Manager
+  # release notes.
+  home.stateVersion = "26.11"; # Please read the comment before changing.
 }

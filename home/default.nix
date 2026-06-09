@@ -2,7 +2,7 @@
 
 let
   homeDirectory = "/home/${config._module.args.username}";
-  persistentStoragePath = "${config._module.args.persistent}${homeDirectory}";
+  persistentStoragePath = config._module.args.persistent;
   removePrefixPath = prefix: path:
     let
       start = lib.splitString "/" prefix;
@@ -21,13 +21,13 @@ in
     import x { inherit config pkgs lib homeDirectory persistentStoragePath strip configHome; }
   )) [
     ./home.nix
-    ./hyprland.nix
-    ./waybar.nix
+#     ./hyprland.nix
+#     ./waybar.nix
     ./persistent.nix
     ./zsh.nix
-    ./dunst.nix
-    ./foot.nix
-    ./wofi.nix
-    ./waypaper.nix
+#     ./dunst.nix
+#     ./foot.nix
+#     ./wofi.nix
+#     ./waypaper.nix
   ];
 }

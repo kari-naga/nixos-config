@@ -1,9 +1,11 @@
+{ config, ... }:
+
 {
   disko.devices = {
     disk = {
-      vdb = {
+      main = {
         type = "disk";
-        device = "/dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51";
+        device = config._module.args.maindisk;
         content = {
           type = "gpt";
           partitions = {
@@ -16,6 +18,7 @@
                 type = "filesystem";
                 format = "vfat";
                 mountpoint = "/boot";
+                mountOptions = [ "umask=0077" ];
               };
             };
             root = {
@@ -42,13 +45,13 @@
                   };
                   # Subvolume for the swapfile
                   "/swap" = {
-                    mountOptions = [ "noatime" ];
-                    mountpoint = "/swap";
+                    mountpoint = "/.swapvol";
                     swap = {
                       swapfile.size = "32G";
                     };
                   };
                 };
+                mountpoint = "/partition-root";
                 swap = {
                   swapfile = {
                     size = "32G";
@@ -62,4 +65,3 @@
     };
   };
 }
-

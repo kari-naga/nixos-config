@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.3.0";
+      url = "github:nix-community/lanzaboote/v1.0.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     disko = {
@@ -19,17 +19,21 @@
   outputs = { self, nixpkgs, lanzaboote, disko, home-manager, impermanence, ... } @ attrs:
   let
     system = "x86_64-linux";
-    hostname = "FusionBolt";
+    hostname = "sapphire";
     username = "atom";
     persistent = "/persistent";
-    args = { inherit hostname username persistent; };
+    maindisk = "/dev/nvme0n1";
+    mainpartition = "/dev/nvme0n1p2";
+    args = { inherit hostname username persistent maindisk mainpartition; };
   in {
     nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
       specialArgs = attrs;
       modules = [
         { _module = { inherit args; }; }
+        ./configuration.nix
         lanzaboote.nixosModules.lanzaboote
         disko.nixosModules.disko
+        ./disko-config.nix
         home-manager.nixosModules.home-manager {
           home-manager = {
             useGlobalPkgs = true;
@@ -42,8 +46,6 @@
           };
         }
         impermanence.nixosModules.impermanence
-        ./disko-config.nix
-        ./configuration.nix
       ];
     };
   };

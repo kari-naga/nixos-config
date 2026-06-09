@@ -6,15 +6,20 @@
   - Can make secure boot compatible media by first flashing NixOS installer ISO then copying `bootx64.efi`, `grubx64.efi`, and `mmx64.efi` from a signed ISO (e.g. Fedora installer) into `EFI/boot`, replacing any existing files
 - Comment out Lanzaboote section and enable `systemd-boot`
 - Turn off secure boot and boot into installation media
-- Run `ls /dev/disk/by-id` and check the device name of the target storage (e.g. `nvme-HFS002TEJ9X101N_AJCCN53941470CM51`)
-  - Edit the `device` field in `disko-config.nix` and the target partition (append `-part2` to the device name) under `boot.initrd.postDeviceCommands` in `configuration.nix` appropriately
-- Run `sudo lshw -c display` and change the bus IDs for Nvidia Prime in `configuration.nix`
-  - Remove leading zeroes, convert from hexadecimal to decimal, and replace periods with colons
-  - Only last three numbers needed
-- Run `sudo nix --experimental-features "nix-command flakes" run github:nix-community/disko -- --mode disko [absolute path to repo]/disko-config.nix`
-- Use `mkpasswd -m yescrypt > [user].yescrypt` to generate hashed password files for user and root
-  - Place them in `/mnt/persistent/passwd`
-- Run `sudo nixos-install --flake [absolute path to repo]#FusionBolt`
+- Find the proper disk in `/dev`
+  - Edit `maindevice` and `mainpartition` in `flake-config.nix` appropriately
+- Run `sudo nix --experimental-features "nix-command flakes" run 'github:nix-community/disko/latest#disko-install' -- --write-efi-boot-entries --flake '[absolute path to repo]#mymachine' --disk main [maindisk]`
+- Run the following:
+```sh
+mount [mainpartition] /mnt
+cd /mnt/persistent
+sudo -s
+mkdir passwd
+mkpasswd -m yescrypt > [user].yescrypt
+mkpasswd -m yescrypt > root.yescrypt
+mkdir -p /mnt/persistent/home/[user]/.config/dotfiles
+cp -r [absolute path to repo]/* /mnt/persistent/home/[user]/.config/dotfiles
+```
 - Reboot into NixOS
 - Run `sudo sbctl create-keys`
 - Disable `systemd-boot` and uncomment the Lanzaboote section, then run `nix-switch` and verify with `sudo sbctl verify`

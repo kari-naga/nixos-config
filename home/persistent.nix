@@ -2,29 +2,30 @@
 
 {
   home.persistence.${persistentStoragePath} = {
-    allowOther = true;
     directories = [
-      ".vscode"
-      "${configHome}/Code"
-      "${configHome}/microsoft-edge"
-      "${configHome}/dotfiles"
-      "${configHome}/Code"
-      "${configHome}/hypr"
-      "${configHome}/waybar"
-      "${configHome}/zsh"
-      "${configHome}/dunst"
-      "${configHome}/rog"
-      "${configHome}/foot"
-      "${configHome}/waypaper"
+      ".cache"
+      { directory = ".gnupg"; mode = "0700"; }
+      { directory = ".ssh"; mode = "0700"; }
+      { directory = ".nixops"; mode = "0700"; }
+      { directory = ".local/share/keyrings"; mode = "0700"; }
+      ".local/share"
+      ".local/state"
+      configHome
+#       "${configHome}/dotfiles"
+#       "${configHome}/microsoft-edge"
+#       "${configHome}/1Password"
+#       "${configHome}/zsh"
     ] ++ map (directory: {
       directory = strip directory;
-      method = "symlink";
     }) [
       config.xdg.userDirs.desktop
       config.xdg.userDirs.documents
       config.xdg.userDirs.music
       config.xdg.userDirs.pictures
       config.xdg.userDirs.videos
+    ];
+    files = [
+      ".screenrc"
     ];
   };
 }

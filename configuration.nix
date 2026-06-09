@@ -1,8 +1,8 @@
 # Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
+# your system. Help is available in the configuration.nix(5) man page, on
+# https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, pkgs, lib, hyprland, ... }:
+{ config, lib, pkgs, utils, ... }:
 
 {
   imports =
@@ -10,52 +10,70 @@
       ./hardware-configuration.nix
     ];
 
-  # Bootloader
-  boot.loader.efi.canTouchEfiVariables = true;
+  # Use the systemd-boot EFI boot loader.
   # boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
-  # Lanzaboote
   boot.loader.systemd-boot.enable = lib.mkForce false;
   boot.lanzaboote = {
     enable = true;
-    pkiBundle = "/etc/secureboot";
+    pkiBundle = "/var/lib/sbctl";
   };
 
-  boot.initrd.supportedFilesystems = [ "btrfs" ];
-  boot.initrd.systemd = {
+  # Use latest kernel.
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+
+  boot.plymouth = {
     enable = true;
-    emergencyAccess = true;
-    initrdBin = with pkgs; [
-      coreutils
-      btrfs-progs
+    theme = "rings";
+    themePackages = with pkgs; [
+      # By default we would install all themes
+      (adi1090x-plymouth-themes.override {
+        selected_themes = [ "rings" ];
+      })
     ];
-    services.initrd-root-wipe = {
-      description = "Wipe root on boot";
-      wantedBy = [
-        "initrd-root-fs.target"
-        "initrd.target"
-      ];
-      requires = [
-        # "systemd-cryptsetup@{hostname}.service"
-        "dev-disk-by\\x2did-nvme\\x2dHFS002TEJ9X101N_AJCCN53941470CM51\\x2dpart2.device"
-        "initrd-root-device.target"
-      ];
+  };
+
+  boot.resumeDevice = config._module.args.mainpartition;
+
+  boot.consoleLogLevel = 3;
+  boot.initrd.verbose = false;
+  boot.kernelParams = [
+    # Silent boot
+    "quiet"
+    "rd.udev.log_level=3"
+    "rd.systemd.show_status=auto"
+    # General params
+#     "i915.force_probe=7d55"
+#     "acpi_backlight=native"
+#     "i915.enable_dpcd_backlight=1"
+    "resume_offset=8658176"
+  ];
+  boot.loader.timeout = 0;
+
+  boot.initrd.systemd = {
+    enable = true; # Default in 26.05
+    services.wipe-file-systems = {
+      # Specify dependencies explicitly
+      unitConfig.DefaultDependencies = false;
+      # The script needs to run to completion before this service is done
+      serviceConfig.Type = "oneshot";
+      # This service is required for boot to succeed
+      requiredBy = [ "initrd.target" ];
+      # Should complete before any file systems are mounted
+      before = [ "sysroot.mount" ];
+
+      # Wait for the disk to appear
+      requires = [ "${utils.escapeSystemdPath config._module.args.mainpartition}.device" ];
       after = [
-        # "systemd-cryptsetup@{hostname}.service"
-        "dev-disk-by\\x2did-nvme\\x2dHFS002TEJ9X101N_AJCCN53941470CM51\\x2dpart2.device"
-        "initrd-root-device.target"
+        "${utils.escapeSystemdPath config._module.args.mainpartition}.device"
+        # Allow hibernation to resume before trying to alter any data
+        "local-fs-pre.target"
       ];
-      before = [ 
-        "sysroot.mount"
-      ];
-      unitConfig.DefaultDependencies = "no";
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = "yes";
-      };
+
       script = ''
-        mkdir -p /btrfs_tmp
-        mount /dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51-part2 /btrfs_tmp # change if necessary
+        mkdir /btrfs_tmp
+        mount ${config._module.args.mainpartition} /btrfs_tmp
         if [[ -e /btrfs_tmp/root ]]; then
             mkdir -p /btrfs_tmp/old_roots
             timestamp=$(date --date="@$(stat -c %Y /btrfs_tmp/root)" "+%Y-%m-%-d_%H:%M:%S")
@@ -80,80 +98,47 @@
     };
   };
 
-  # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
-  boot.resumeDevice = "/dev/disk/by-id/nvme-HFS002TEJ9X101N_AJCCN53941470CM51-part2";
-  systemd.sleep.extraConfig = ''
-    [Sleep]
-    HibernateMode=shutdown
-  '';
-  
-  boot.plymouth = {
-    enable = true;
-    theme = "breeze";
-  };
-  boot.consoleLogLevel = 0;
-  boot.initrd.verbose = false;
-  boot.kernelParams = [
-    # Silent boot
-    "quiet"
-    "splash"
-    "loglevel=3"
-    "systemd.show_status=auto"
-    "rd.systemd.show_status=auto"
-    "udev.log_level=3"
-    "rd.udev.log_level=3"
-    "udev.log_priority=3"
-    "rd.udev.log_priority=3"
-    "boot.shell_on_fail"
-    # General params
-    "i915.force_probe=7d55"
-    "acpi_backlight=native"
-    "i915.enable_dpcd_backlight=1"
-    "resume_offset=8922368" # https://sawyershepherd.org/post/hibernating-to-an-encrypted-swapfile-on-btrfs-with-nixos/
-    "nvidia.NVreg_PreserveVideoMemoryAllocations=1"
-  ];
-  boot.loader.timeout = 3;
-
-  # boot.extraModprobeConfig = ''
-  #   options snd-hda-intel model=asus-zenbook
-  # '';
 
   networking.hostName = config._module.args.hostname; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-  # networking.wireless.userControlled.enable = true;
+
+  # Configure network connections interactively with nmcli or nmtui.
+  networking.networkmanager.enable = true;
+
+  # Set your time zone.
+  time.timeZone = "US/Eastern";
 
   # Configure network proxy if necessary
   # networking.proxy.default = "http://user:password@proxy:port/";
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
-  # Enable networking
-  networking.networkmanager.enable = true;
-  # networking.networkmanager.unmanaged = [ "*" "except:type:wwan" "except:type:gsm" ];
-  networking.firewall.enable = true;
-
-  # Set your time zone.
-  time.timeZone = "US/Eastern";
-
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
+  console = {
+#     font = "Lat2-Terminus16";
+#     keyMap = "us";
+    useXkbConfig = true; # use xkb.options in tty.
   };
+
+  # Enable the X11 windowing system.
+  # services.xserver.enable = true;
 
   # Configure keymap in X11
-  services.xserver = {
-    xkb.layout = "us";
-    xkb.variant = "";
+  # services.xserver.xkb.layout = "us";
+  # services.xserver.xkb.options = "eurosign:e,caps:escape";
+
+  # Enable CUPS to print documents.
+  # services.printing.enable = true;
+
+  # Enable sound.
+  # services.pulseaudio.enable = true;
+  # OR
+  services.pipewire = {
+    enable = true;
+    pulse.enable = true;
   };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users = {
@@ -168,45 +153,91 @@
     users.root.hashedPasswordFile = "${config._module.args.persistent}/passwd/root.yescrypt";
   };
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
+  # programs.firefox.enable = true;
+  programs.zsh.enable = true;
 
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "atom" ];
+  };
+
+  services.fprintd.enable = true;
+  services.fprintd.tod.enable = true;
+  services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
+
+  services.desktopManager.plasma6.enable = true;
+  services.displayManager.sddm.enable = true;
+  services.displayManager.sddm.wayland.enable = true;
+
+  # List packages installed in system profile.
+  # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
+    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
     gnupg
     usbutils
-    xorg.xhost
     sbctl
-    libva
-    nvidia-vaapi-driver
-    libsForQt5.qt5.qtwayland
-    qt6.qtwayland
-    xdg-desktop-portal-gtk
-    gnome.gnome-themes-extra
-    gnome.adwaita-icon-theme
-    where-is-my-sddm-theme
+    e2fsprogs
+    # KDE Utilities
+    kdePackages.discover
+    kdePackages.kcalc
+    kdePackages.kcharselect
+    kdePackages.kclock
+    kdePackages.kcolorchooser
+    kdePackages.kolourpaint
+    kdePackages.ksystemlog
+    kdePackages.sddm-kcm
+    kdiff3
+    kdePackages.isoimagewriter
+    kdePackages.partitionmanager
+    hardinfo2
+    wayland-utils
+    wl-clipboard
+    vlc
+    microsoft-edge
   ];
-
-  services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
-
-  services.dbus.enable = true;
-  services.dbus.packages = [ pkgs.gcr ];
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
+  programs.mtr.enable = true;
+  programs.gnupg.agent = {
+    enable = true;
+    enableSSHSupport = true;
+  };
 
   # List services that you want to enable:
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  powerManagement.enable = true;
+
+  security.sudo.extraConfig = ''
+    Defaults lecture = never
+  '';
+
+  environment.persistence.${config._module.args.persistent} = {
+    hideMounts = true;
+    directories = [
+      "/var/log"
+      "/var/lib/systemd"
+      "/var/lib/bluetooth"
+      "/var/lib/nixos"
+      "/var/lib/sbctl"
+      "/var/lib/fprint"
+      "/var/cache"
+      "/etc/NetworkManager/system-connections"
+    ];
+    files = [
+      "/etc/machine-id"
+    ];
+  };
+
+  fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
+
+  swapDevices = lib.mkForce [ { device = "/.swapvol/swapfile"; } ];
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -214,55 +245,15 @@
   # Or disable the firewall altogether.
   # networking.firewall.enable = false;
 
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "23.11"; # Did you read the comment?
+  # Copy the NixOS configuration file and link it from the resulting system
+  # (/run/current-system/configuration.nix). This is useful in case you
+  # accidentally delete configuration.nix.
+  # system.copySystemConfiguration = true;
 
-  powerManagement.enable = true;
-
-  services.thermald.enable = true;
-  services.tlp.enable = true;
-  services.fstrim.enable = true;
-  services.hardware.bolt.enable = true;
-  services.devmon.enable = true;
-  services.gvfs.enable = true;
-  services.udisks2.enable = true;
-  services.asusd.enable = true;
-  services.asusd.enableUserService = true;
-  services.gnome.gnome-keyring.enable = true;
-
-  programs.zsh.enable = true;
-  programs.light.enable = true;
-  programs.dconf.enable = true;
-
-  # In progress (https://wiki.archlinux.org/title/Laptop/ASUS)
-  systemd.services."battery-charge-threshold" = {
-    description = "Set the battery charge threshold";
-    after = [ "multi-user.target" ];
-    startLimitBurst = 0;
-    serviceConfig = {
-      Type = "oneshot";
-      Restart = "on-failure";
-      ExecStart = "/run/current-system/sw/bin/bash -c 'echo 80 > /sys/class/power_supply/BAT1/charge_control_end_threshold'";
-    };
-    wantedBy = [ "multi-user.target" ];
-  };
-  powerManagement.resumeCommands = ''
-    echo 80 > /sys/class/power_supply/BAT0/charge_control_end_threshold
-  '';
-
-  fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
-
+  # nix.nixPath = nix.nixPath ++ [ "/home/atom/.config/dotfiles" ];
   nix.settings = {
     experimental-features = [ "nix-command" "flakes" ];
-    substituters = [ "https://hyprland.cachix.org" ];
-    trusted-public-keys = [ "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc=" ];
   };
-
   nix.optimise.automatic = true;
   nix.gc = {
     automatic = true;
@@ -270,118 +261,26 @@
     options = "--delete-older-than 30d";
   };
 
-  hardware.opengl = {
-    enable = true;
-    driSupport = true;
-    driSupport32Bit = true;
-  };
+  # Allow unfree packages
+  nixpkgs.config.allowUnfree = true;
 
-  services.xserver = {
-    enable = true;
-    videoDrivers = [ "nvidia" ];
-    displayManager = {
-      autoLogin = {
-        enable = true;
-        user = config._module.args.username;
-      };
-      defaultSession = "hyprland";
-      sddm = {
-        enable = true;
-        wayland.enable = true;
-        enableHidpi = true;
-        theme = "where_is_my_sddm_theme";
-      };
-      # gdm = {
-      #   enable = true;
-      #   wayland = true;
-      # };
-    };
-    libinput.enable = true;
-  };
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = true;
-    powerManagement.finegrained = true;
-    open = false;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-    prime = {
-      offload = {
-        enable = true;
-        enableOffloadCmd = true;
-      };
-      # edit bus IDs as needed (sudo lshw -c display)
-      intelBusId = "PCI:0:2:0";
-      nvidiaBusId = "PCI:1:0:0";
-    };
-  };
-
-  sound.enable = false;
-  sound.mediaKeys.enable = false;
-  services.pipewire = {
-    enable = true;
-    audio.enable = true;
-    pulse.enable = true;
-    alsa = {
-      enable = true;
-      support32Bit = true;
-    };
-    jack.enable = true;
-  };
-
-  security.sudo.extraConfig = ''
-    Defaults lecture = never
-  '';
-
-  security.polkit.enable = true;
-  security.rtkit.enable = true;
-  xdg.portal.wlr.enable = true;
-
-  programs.hyprland = {
-    enable = true;
-    package = hyprland.packages.${pkgs.system}.hyprland;
-    xwayland.enable = true;
-  };
-
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = "1";
-  };
-
-  swapDevices = lib.mkForce [ { device = "/swap/swapfile"; } ];
-
-  programs.fuse.userAllowOther = true;
-
-  environment.persistence.${config._module.args.persistent} = {
-    hideMounts = true;
-    directories = [
-      "/var/log"
-      "/var/lib/systemd"
-      "/var/cache"
-      "/var/lib/bluetooth"
-      "/var/lib/nixos"
-      "/etc/NetworkManager/system-connections"
-      "/etc/secureboot"
-    ];
-    files = [
-      "/etc/machine-id"
-    ];
-    users.${config._module.args.username} = {
-      directories = [
-        ".cache"
-        { directory = ".gnupg"; mode = "0700"; }
-        { directory = ".ssh"; mode = "0700"; }
-        ".local/share"
-        ".local/state"
-      ];
-    };
-  };
-
-  # boot.initrd.postMountCommands = lib.mkBefore ''
-  #   ln -snfT ${config._module.args.persistent}/etc/machine-id /etc/machine-id
-  # '';
-
-  fonts.packages = with pkgs; [
-    (nerdfonts.override { fonts = [ "FiraCode" "JetBrainsMono" "Meslo" ]; })
-  ];
+  # This option defines the first version of NixOS you have installed on this particular machine,
+  # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
+  #
+  # Most users should NEVER change this value after the initial install, for any reason,
+  # even if you've upgraded your system to a new NixOS release.
+  #
+  # This value does NOT affect the Nixpkgs version your packages and OS are pulled from,
+  # so changing it will NOT upgrade your system - see https://nixos.org/manual/nixos/stable/#sec-upgrading for how
+  # to actually do that.
+  #
+  # This value being lower than the current NixOS release does NOT mean your system is
+  # out of date, out of support, or vulnerable.
+  #
+  # Do NOT change this value unless you have manually inspected all the changes it would make to your configuration,
+  # and migrated your data accordingly.
+  #
+  # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
+  system.stateVersion = "26.05"; # Did you read the comment?
 }
+
