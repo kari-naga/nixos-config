@@ -11,8 +11,8 @@ in {
 
   home.sessionVariables = {
     ZDOTDIR = "${config.xdg.configHome}/zsh";
-    EDITOR = "zed --wait";
-    VISUAL = "zed --wait";
+    EDITOR = "zeditor --wait";
+    VISUAL = "zeditor --wait";
     SSH_AUTH_SOCK = onePassPath;
   };
 
@@ -22,7 +22,7 @@ in {
   ];
 
   home.shell.enableShellIntegration = true;
-  
+
   xdg = {
     enable = true;
     mime.enable = true;

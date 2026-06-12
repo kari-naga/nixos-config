@@ -36,7 +36,7 @@
 
   boot.resumeDevice = config._module.args.mainpartition;
 
-  boot.consoleLogLevel = 0;
+  boot.consoleLogLevel = 3;
   boot.initrd.verbose = false;
   boot.kernelParams = [
     # Silent boot
@@ -222,6 +222,7 @@
     sbctl
     e2fsprogs
     nixd
+    nil
     # KDE Utilities
     kdePackages.discover
     kdePackages.kcalc

@@ -22,8 +22,8 @@
     hostname = "sapphire";
     username = "atom";
     persistent = "/persistent";
-    maindisk = "/dev/nvme0n1";
-    mainpartition = "/dev/nvme0n1p2";
+    maindisk = "/dev/disk/by-diskseq/1";
+    mainpartition = "/dev/disk/by-partlabel/disk-main-root";
     args = { inherit hostname username persistent maindisk mainpartition; };
   in {
     nixosConfigurations.${hostname} = nixpkgs.lib.nixosSystem {
