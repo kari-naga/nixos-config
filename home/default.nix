@@ -15,8 +15,7 @@ let
     else join tokens;
   strip = removePrefixPath homeDirectory;
   configHome = strip config.xdg.configHome;
-in
-{
+in {
   imports = map (x: (
     import x { inherit config pkgs lib homeDirectory persistentStoragePath strip configHome; }
   )) [
@@ -25,6 +24,7 @@ in
 #     ./waybar.nix
     ./persistent.nix
     ./zsh.nix
+    ./zed.nix
 #     ./dunst.nix
 #     ./foot.nix
 #     ./wofi.nix

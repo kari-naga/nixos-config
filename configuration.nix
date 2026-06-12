@@ -44,9 +44,8 @@
     "rd.udev.log_level=3"
     "rd.systemd.show_status=auto"
     # General params
-#     "i915.force_probe=7d55"
-#     "acpi_backlight=native"
-#     "i915.enable_dpcd_backlight=1"
+    "i915.force_probe=9a49"
+    "i915.enable_guc=3"
     "resume_offset=8658176"
   ];
   boot.loader.timeout = 0;
@@ -98,6 +97,28 @@
     };
   };
 
+  services.xserver.videoDrivers = [ "modesetting" ];
+
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      # Required for modern Intel GPUs (Xe iGPU and ARC)
+      intel-media-driver     # VA-API (iHD) userspace
+      vpl-gpu-rt             # oneVPL (QSV) runtime
+
+      # Optional (compute / tooling):
+      intel-compute-runtime  # OpenCL (NEO) + Level Zero for Arc/Xe
+      # NOTE: 'intel-ocl' also exists as a legacy package; not recommended for Arc/Xe.
+      # libvdpau-va-gl       # Only if you must run VDPAU-only apps
+    ];
+  };
+
+  hardware.enableRedistributableFirmware = true;
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "iHD";     # Prefer the modern iHD backend
+    # VDPAU_DRIVER = "va_gl";      # Only if using libvdpau-va-gl
+  };
 
   networking.hostName = config._module.args.hostname; # Define your hostname.
 
@@ -146,7 +167,7 @@
     users.${config._module.args.username} = {
       isNormalUser = true;
       description = "Kari Naga";
-      extraGroups = [ "networkmanager" "wheel" "video" ];
+      extraGroups = [ "networkmanager" "wheel" "video" "render" ];
       hashedPasswordFile = "${config._module.args.persistent}/passwd/${config._module.args.username}.yescrypt";
       shell = pkgs.zsh;
     };
@@ -163,8 +184,8 @@
   };
 
   services.fprintd.enable = true;
-  services.fprintd.tod.enable = true;
-  services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
+#   services.fprintd.tod.enable = true;
+#   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-elan;
 
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.enable = true;
@@ -205,6 +226,11 @@
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
+  };
+
+  programs.nix-ld = {
+    enable = true;
+    libraries = pkgs.steam-run.args.multiPkgs pkgs;
   };
 
   # List services that you want to enable:

@@ -1,9 +1,27 @@
 { config, pkgs, lib, homeDirectory, configHome, ... }:
 
-{
+let
+  onePassPath = if pkgs.stdenv.isDarwin
+    then "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    else "${config.home.homeDirectory}/.1password/agent.sock";
+in {
   home.username = config._module.args.username;
   home.homeDirectory = homeDirectory;
   programs.home-manager.enable = true;
+
+  home.sessionVariables = {
+    ZDOTDIR = "${config.xdg.configHome}/zsh";
+    EDITOR = "zed --wait";
+    VISUAL = "zed --wait";
+    SSH_AUTH_SOCK = onePassPath;
+  };
+
+  home.packages = [
+    pkgs.zed-editor
+    pkgs.helix
+  ];
+
+  home.shell.enableShellIntegration = true;
   
   xdg = {
     enable = true;
@@ -43,10 +61,12 @@
 
   programs.ssh = {
     enable = true;
-    extraConfig = ''
-      Host *
-          IdentityAgent ${config.home.homeDirectory}/.1password/agent.sock
-    '';
+    enableDefaultConfig = false;
+    settings = {
+      "*" = {
+        IdentityAgent = onePassPath;
+      };
+    };
   };
 
   # This value determines the Home Manager release that your configuration is
