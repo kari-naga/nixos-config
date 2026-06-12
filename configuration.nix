@@ -2,13 +2,19 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, pkgs, utils, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  utils,
+  ...
+}:
 
 {
-  imports =
-    [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
-    ];
+  imports = [
+    # Include the results of the hardware scan.
+    ./hardware-configuration.nix
+  ];
 
   # Use the systemd-boot EFI boot loader.
   # boot.loader.systemd-boot.enable = true;
@@ -112,11 +118,11 @@
     enable = true;
     extraPackages = with pkgs; [
       # Required for modern Intel GPUs (Xe iGPU and ARC)
-      intel-media-driver     # VA-API (iHD) userspace
-      vpl-gpu-rt             # oneVPL (QSV) runtime
+      intel-media-driver # VA-API (iHD) userspace
+      vpl-gpu-rt # oneVPL (QSV) runtime
 
       # Optional (compute / tooling):
-      intel-compute-runtime  # OpenCL (NEO) + Level Zero for Arc/Xe
+      intel-compute-runtime # OpenCL (NEO) + Level Zero for Arc/Xe
       # NOTE: 'intel-ocl' also exists as a legacy package; not recommended for Arc/Xe.
       # libvdpau-va-gl       # Only if you must run VDPAU-only apps
     ];
@@ -125,7 +131,7 @@
   hardware.enableRedistributableFirmware = true;
 
   environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "iHD";     # Prefer the modern iHD backend
+    LIBVA_DRIVER_NAME = "iHD"; # Prefer the modern iHD backend
     # VDPAU_DRIVER = "va_gl";      # Only if using libvdpau-va-gl
   };
 
@@ -144,8 +150,8 @@
   # Select internationalisation properties.
   i18n.defaultLocale = "en_US.UTF-8";
   console = {
-#     font = "Lat2-Terminus16";
-#     keyMap = "us";
+    #     font = "Lat2-Terminus16";
+    #     keyMap = "us";
     useXkbConfig = true; # use xkb.options in tty.
   };
 
@@ -187,7 +193,12 @@
     users.${config._module.args.username} = {
       isNormalUser = true;
       description = "Kari Naga";
-      extraGroups = [ "networkmanager" "wheel" "video" "render" ];
+      extraGroups = [
+        "networkmanager"
+        "wheel"
+        "video"
+        "render"
+      ];
       hashedPasswordFile = "${config._module.args.persistent}/passwd/${config._module.args.username}.yescrypt";
       shell = pkgs.zsh;
     };
@@ -204,8 +215,8 @@
   };
 
   services.fprintd.enable = true;
-#   services.fprintd.tod.enable = true;
-#   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-elan;
+  #   services.fprintd.tod.enable = true;
+  #   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-elan;
 
   services.desktopManager.plasma6.enable = true;
   services.displayManager.sddm.enable = true;
@@ -300,7 +311,10 @@
 
   # nix.nixPath = nix.nixPath ++ [ "/home/atom/.config/dotfiles" ];
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
   };
   nix.optimise.automatic = true;
   nix.gc = {
