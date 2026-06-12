@@ -23,29 +23,38 @@
   # Use latest kernel.
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  boot.plymouth = {
-    enable = true;
-    theme = "rings";
-    themePackages = with pkgs; [
-      # By default we would install all themes
-      (adi1090x-plymouth-themes.override {
-        selected_themes = [ "rings" ];
-      })
-    ];
-  };
+  # boot.plymouth = {
+  #   enable = true;
+  #   theme = "rings";
+  #   themePackages = with pkgs; [
+  #     # By default we would install all themes
+  #     (adi1090x-plymouth-themes.override {
+  #       selected_themes = [ "rings" ];
+  #     })
+  #   ];
+  # };
 
   boot.resumeDevice = config._module.args.mainpartition;
 
-  boot.consoleLogLevel = 3;
+  boot.consoleLogLevel = 0;
   boot.initrd.verbose = false;
   boot.kernelParams = [
     # Silent boot
     "quiet"
-    "rd.udev.log_level=3"
+    "splash"
+    "loglevel=3"
+    "systemd.show_status=auto"
     "rd.systemd.show_status=auto"
+    "udev.log_level=3"
+    "rd.udev.log_level=3"
+    "udev.log_priority=3"
+    "rd.udev.log_priority=3"
+    "boot.shell_on_fail"
     # General params
     "i915.force_probe=9a49"
     "i915.enable_guc=3"
+    "acpi_backlight=native"
+    "i915.enable_dpcd_backlight=1"
     "resume_offset=8658176"
   ];
   boot.loader.timeout = 0;
@@ -151,11 +160,22 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  # services.pulseaudio.enable = true;
+  services.pulseaudio.enable = false;
   # OR
+  security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
+    alsa = {
+      enable = true;
+      support32Bit = true;
+    };
     pulse.enable = true;
+    # jack.enable = true;
+  };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
   };
 
   # Enable touchpad support (enabled default in most desktopManager).
@@ -201,6 +221,7 @@
     usbutils
     sbctl
     e2fsprogs
+    nixd
     # KDE Utilities
     kdePackages.discover
     kdePackages.kcalc
@@ -309,4 +330,3 @@
   # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
   system.stateVersion = "26.05"; # Did you read the comment?
 }
-
