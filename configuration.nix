@@ -244,9 +244,11 @@
     nixd
     nil
     noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    libheif
+    libheif.out
     # Graphical Applications
     microsoft-edge
-    dolphin
+    nautilus
     alacritty
     # # KDE Utilities
     # kdePackages.discover
@@ -265,6 +267,9 @@
     # wl-clipboard
     # vlc
   ];
+  environment.pathsToLink = [ "share/thumbnailers" ];
+
+  services.udisks2.enable = true;
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
@@ -324,6 +329,19 @@
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
   # system.copySystemConfiguration = true;
+
+  nixpkgs.overlays = [
+    (final: prev: {
+      nautilus = prev.nautilus.overrideAttrs (nprev: {
+        buildInputs =
+          nprev.buildInputs
+          ++ (with pkgs.gst_all_1; [
+            gst-plugins-good
+            gst-plugins-bad
+          ]);
+      });
+    })
+  ];
 
   # nix.nixPath = nix.nixPath ++ [ "/home/atom/.config/dotfiles" ];
   nix.settings = {
