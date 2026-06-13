@@ -13,6 +13,7 @@
         polkit_agent = true;
         setup_wizard_enabled = false;
         avatar_path = "${config.xdg.userDirs.pictures}/supernova-cropped.jpg";
+        time_format = "{:%-I:%M %p}";
       };
 
       # This may also be a string or path to a .toml file.
@@ -34,11 +35,14 @@
 
       wallpaper = {
         enabled = true;
+        backdrop.enablde = true;
         directory = "${config.xdg.userDirs.pictures}/Wallpapers";
         directory_light = "${config.xdg.userDirs.pictures}/Wallpapers";
         directory_dark = "${config.xdg.userDirs.pictures}/Wallpapers";
         default.path = "${config.xdg.userDirs.pictures}/Wallpapers/wallpaper.jpg";
       };
+
+      location.auto_locate = true;
 
       widget = {
         tray = {
