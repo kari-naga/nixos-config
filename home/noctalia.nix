@@ -46,6 +46,9 @@
       location.auto_locate = true;
 
       widget = {
+        clock = {
+          format = "{:%-I:%M %p}";
+        };
         tray = {
           drawer = true;
         };

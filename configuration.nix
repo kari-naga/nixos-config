@@ -246,7 +246,7 @@
     noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
     # Graphical Applications
     microsoft-edge
-    nautilus
+    dolphin
     alacritty
     # # KDE Utilities
     # kdePackages.discover
