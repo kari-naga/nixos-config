@@ -35,12 +35,13 @@
 
       wallpaper = {
         enabled = true;
-        backdrop.enablde = true;
         directory = "${config.xdg.userDirs.pictures}/Wallpapers";
         directory_light = "${config.xdg.userDirs.pictures}/Wallpapers";
         directory_dark = "${config.xdg.userDirs.pictures}/Wallpapers";
         default.path = "${config.xdg.userDirs.pictures}/Wallpapers/wallpaper.jpg";
       };
+
+      backdrop.enabled = true;
 
       location.auto_locate = true;
 
