@@ -1,4 +1,9 @@
-{ config, pkgs, lib, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 
 {
   programs.zed-editor = {
@@ -18,6 +23,7 @@
       "html"
       "java"
       "julia"
+      "kdl"
       "kotlin"
       "latex"
       "log"

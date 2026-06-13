@@ -7,6 +7,7 @@
   lib,
   pkgs,
   utils,
+  noctalia,
   ...
 }:
 
@@ -180,7 +181,7 @@
   # Enable touchpad support (enabled default in most desktopManager).
   services.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # Define a user account. Don't./files/.p10k.zsh forget to set a password with ‘passwd’.
   users = {
     mutableUsers = false;
     users.${config._module.args.username} = {
@@ -211,9 +212,24 @@
   #   services.fprintd.tod.enable = true;
   #   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-elan;
 
-  services.desktopManager.plasma6.enable = true;
-  services.displayManager.sddm.enable = true;
-  services.displayManager.sddm.wayland.enable = true;
+  # services.desktopManager.plasma6.enable = true;
+  # services.displayManager.sddm.enable = true;
+  # services.displayManager.sddm.wayland.enable = true;
+
+  programs.niri.enable = true;
+
+  programs.noctalia-greeter = {
+    enable = true;
+    greeter-args = "--session niri";
+  };
+
+  # NixOS otherwise injects a stripped PATH via Environment= on the niri.service
+  # unit which shadows the imported user-manager PATH. Disabling the default
+  # lets niri inherit the full PATH set up by niri-session.
+  systemd.user.services.niri.enableDefaultPath = false;
+
+  security.polkit.enable = true; # polkit
+  services.gnome.gnome-keyring.enable = true; # secret service
 
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
@@ -227,23 +243,27 @@
     e2fsprogs
     nixd
     nil
-    # KDE Utilities
-    kdePackages.discover
-    kdePackages.kcalc
-    kdePackages.kcharselect
-    kdePackages.kclock
-    kdePackages.kcolorchooser
-    kdePackages.kolourpaint
-    kdePackages.ksystemlog
-    kdePackages.sddm-kcm
-    kdiff3
-    kdePackages.isoimagewriter
-    kdePackages.partitionmanager
-    hardinfo2
-    wayland-utils
-    wl-clipboard
-    vlc
+    noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+    # Graphical Applications
     microsoft-edge
+    nautilus
+    alacritty
+    # # KDE Utilities
+    # kdePackages.discover
+    # kdePackages.kcalc
+    # kdePackages.kcharselect
+    # kdePackages.kclock
+    # kdePackages.kcolorchooser
+    # kdePackages.kolourpaint
+    # kdePackages.ksystemlog
+    # kdePackages.sddm-kcm
+    # kdiff3
+    # kdePackages.isoimagewriter
+    # kdePackages.partitionmanager
+    # hardinfo2
+    # wayland-utils
+    # wl-clipboard
+    # vlc
   ];
 
   # Some programs need SUID wrappers, can be configured further or are
@@ -265,6 +285,8 @@
   services.openssh.enable = true;
 
   powerManagement.enable = true;
+  services.power-profiles-daemon.enable = true;
+  services.upower.enable = true;
 
   security.sudo.extraConfig = ''
     Defaults lecture = never
@@ -279,6 +301,7 @@
       "/var/lib/nixos"
       "/var/lib/sbctl"
       "/var/lib/fprint"
+      "/var/lib/noctalia-greeter"
       "/var/cache"
       "/etc/NetworkManager/system-connections"
     ];

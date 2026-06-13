@@ -1,4 +1,10 @@
-{ config, pkgs, lib, configHome, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  configHome,
+  ...
+}:
 
 {
   programs.zsh = {
@@ -13,20 +19,25 @@
       size = 1000;
       save = 1000;
     };
-    initContent = let
-      earlyConfig = lib.mkBefore ''
-        if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
-          source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
-        fi
-      '';
-      config = ''
-        bindkey "^V" ""
-        autoload -Uz promptinit
-        promptinit
-        prompt powerlevel10k
-        [[ ! -f ''${ZDOTDIR}/.p10k.zsh ]] || source "''${ZDOTDIR}/.p10k.zsh"
-      '';
-    in lib.mkMerge [ earlyConfig config ];
+    initContent =
+      let
+        earlyConfig = lib.mkBefore ''
+          if [[ -r "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh" ]]; then
+            source "''${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-''${(%):-%n}.zsh"
+          fi
+        '';
+        config = ''
+          bindkey "^V" ""
+          autoload -Uz promptinit
+          promptinit
+          prompt powerlevel10k
+          [[ ! -f ''${ZDOTDIR}/.p10k.zsh ]] || source "''${ZDOTDIR}/.p10k.zsh"
+        '';
+      in
+      lib.mkMerge [
+        earlyConfig
+        config
+      ];
     antidote = {
       enable = true;
       plugins = [
