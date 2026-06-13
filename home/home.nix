@@ -3,7 +3,6 @@
   pkgs,
   lib,
   homeDirectory,
-  configHome,
   ...
 }:
 
@@ -32,6 +31,10 @@ in
   ];
 
   home.shell.enableShellIntegration = true;
+
+  home.file.".local/share/nix/trusted-settings.json" = {
+    source = ./files/trusted-settings.json;
+  };
 
   xdg = {
     enable = true;

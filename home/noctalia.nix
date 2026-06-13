@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 
 {
   programs.noctalia = {
@@ -7,10 +7,13 @@
     systemd.enable = true;
 
     settings = {
-      launch_apps_as_systemd_services = true;
-      niri_overview_type_to_launch_enabled = true;
-      # polkit_agent = true;
-      setup_wizard_enabled = false;
+      shell = {
+        launch_apps_as_systemd_services = true;
+        niri_overview_type_to_launch_enabled = true;
+        polkit_agent = true;
+        setup_wizard_enabled = false;
+        avatar_path = "${config.xdg.userDirs.pictures}/supernova-cropped.jpg";
+      };
 
       # This may also be a string or path to a .toml file.
       theme = {
@@ -31,7 +34,22 @@
 
       wallpaper = {
         enabled = true;
-        # default.path = "/path/to/wallpapers/wallpaper.png";
+        directory = "${config.xdg.userDirs.pictures}/Wallpapers";
+        directory_light = "${config.xdg.userDirs.pictures}/Wallpapers";
+        directory_dark = "${config.xdg.userDirs.pictures}/Wallpapers";
+        default.path = "${config.xdg.userDirs.pictures}/Wallpapers/wallpaper.jpg";
+      };
+
+      widget = {
+        tray = {
+          drawer = true;
+        };
+        network = {
+          show_label = false;
+        };
+        brightness = {
+          show_label = false;
+        };
       };
     };
   };

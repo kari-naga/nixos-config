@@ -17,9 +17,7 @@
     },
     "disko": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": ["nixpkgs"]
       },
       "locked": {
         "lastModified": 1780894562,
@@ -53,11 +51,7 @@
     },
     "gitignore": {
       "inputs": {
-        "nixpkgs": [
-          "lanzaboote",
-          "pre-commit",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["lanzaboote", "pre-commit", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1709087332,
@@ -75,9 +69,7 @@
     },
     "home-manager": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": ["nixpkgs"]
       },
       "locked": {
         "lastModified": 1780943742,
@@ -95,10 +87,7 @@
     },
     "home-manager_2": {
       "inputs": {
-        "nixpkgs": [
-          "impermanence",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["impermanence", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1768598210,
@@ -136,9 +125,7 @@
     "lanzaboote": {
       "inputs": {
         "crane": "crane",
-        "nixpkgs": [
-          "nixpkgs"
-        ],
+        "nixpkgs": ["nixpkgs"],
         "pre-commit": "pre-commit",
         "rust-overlay": "rust-overlay"
       },
@@ -222,9 +209,7 @@
     },
     "noctalia-greeter": {
       "inputs": {
-        "nixpkgs": [
-          "nixpkgs"
-        ]
+        "nixpkgs": ["nixpkgs"]
       },
       "locked": {
         "lastModified": 1781302139,
@@ -244,10 +229,7 @@
       "inputs": {
         "flake-compat": "flake-compat",
         "gitignore": "gitignore",
-        "nixpkgs": [
-          "lanzaboote",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["lanzaboote", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1765016596,
@@ -276,10 +258,7 @@
     },
     "rust-overlay": {
       "inputs": {
-        "nixpkgs": [
-          "lanzaboote",
-          "nixpkgs"
-        ]
+        "nixpkgs": ["lanzaboote", "nixpkgs"]
       },
       "locked": {
         "lastModified": 1765075567,

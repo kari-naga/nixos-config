@@ -29,7 +29,7 @@
     impermanence.url = "github:nix-community/impermanence";
   };
   outputs =
-    {
+    attrs@{
       self,
       nixpkgs,
       lanzaboote,
@@ -38,7 +38,7 @@
       impermanence,
       noctalia-greeter,
       ...
-    }@attrs:
+    }:
     let
       system = "x86_64-linux";
       hostname = "sapphire";
