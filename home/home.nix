@@ -42,6 +42,12 @@ in
       enable = true;
       createDirectories = true;
     };
+    autostart = {
+      enable = true;
+      entries = [
+        ./files/1password.desktop
+      ];
+    };
   };
 
   programs.git = {

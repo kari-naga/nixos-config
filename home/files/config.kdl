@@ -275,7 +275,7 @@ layout {
 
 spawn-at-startup "noctalia"
 
-spawn-at-startup "1password --silent"
+// spawn-at-startup "1password --silent"
 
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -708,4 +708,8 @@ blur {
   offset 3.0      // sample distance per pass (default: 3.0)
   noise 0.03      // grain overlay (default: 0.02)
   saturation 1.0  // color saturation boost (default: 1.5)
+}
+
+cursor {
+    xcursor-size 48
 }
