@@ -25,6 +25,7 @@
   boot.lanzaboote = {
     enable = true;
     pkiBundle = "/var/lib/sbctl";
+    settings.editor = false;
   };
 
   # Use latest kernel.
@@ -32,6 +33,16 @@
 
   boot.plymouth = {
     enable = true;
+    logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
+  };
+
+  services.logind.settings.Login.LidSwitch = "suspend-then-hibernate";
+  services.logind.settings.Login.HandlePowerKey = "suspend";
+  services.logind.settings.Login.PowerKeyLongPress = "poweroff";
+
+  systemd.sleep.settings.Sleep = {
+    HibernateDelaySec = "30m";
+    SuspendState = "mem";
   };
 
   boot.resumeDevice = config._module.args.mainpartition;
@@ -51,11 +62,12 @@
     "rd.udev.log_priority=3"
     "boot.shell_on_fail"
     # General params
-    "i915.force_probe=9a49"
+    "i915.force_probe=${config._module.args.gpuid}"
     "i915.enable_guc=3"
     "acpi_backlight=native"
     "i915.enable_dpcd_backlight=1"
-    "resume_offset=8658176"
+    "resume_offset=${config._module.args.resumeoffset}"
+    "mem_sleep_default=deep"
   ];
   boot.loader.timeout = 0;
 
@@ -123,6 +135,8 @@
   };
 
   hardware.enableRedistributableFirmware = true;
+
+  services.fwupd.enable = true;
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD"; # Prefer the modern iHD backend
@@ -290,8 +304,16 @@
   services.openssh.enable = true;
 
   powerManagement.enable = true;
-  services.power-profiles-daemon.enable = true;
+  services.tuned = {
+    enable = true;
+    ppdSupport = true;
+    settings = {
+      dynamic_tuning = true;
+    };
+  };
   services.upower.enable = true;
+  hardware.intel-gpu-tools.enable = true;
+  hardware.cpu.intel.updateMicrocode = true;
 
   security.sudo.extraConfig = ''
     Defaults lecture = never

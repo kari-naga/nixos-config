@@ -40,6 +40,8 @@
       persistent = "/persistent";
       maindisk = "/dev/disk/by-diskseq/1";
       mainpartition = "/dev/disk/by-partlabel/disk-main-root";
+      gpuid = "9a49";
+      resumeoffset = "8658176";
       args = {
         inherit
           hostname
@@ -47,6 +49,8 @@
           persistent
           maindisk
           mainpartition
+          gpuid
+          resumeoffset
           ;
       };
     in
