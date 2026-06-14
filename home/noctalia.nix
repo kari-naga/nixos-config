@@ -44,6 +44,13 @@
       backdrop.enabled = true;
 
       location.auto_locate = true;
+      nightlight.enabled = true;
+
+      bar.main = {
+        auto_hide = true;
+        # reserve_space = false;
+        layer = "overlay";
+      };
 
       widget = {
         clock = {
@@ -57,6 +64,46 @@
         };
         brightness = {
           show_label = false;
+        };
+      };
+
+      lockscreen_widgets = {
+        enabled = true;
+        widget = {
+          clock = {
+            box_height = 0.0;
+            box_width = 0.0;
+            cx = 960.0;
+            cy = 445.0;
+            output = "eDP-1";
+            rotation = 0.0;
+            type = "clock";
+            settings = {
+              background = false;
+              format = "{:%-I:%M %p}";
+            };
+            weather = {
+              box_height = 0.0;
+              box_width = 0.0;
+              cx = 960.0;
+              cy = 540.0;
+              output = "eDP-1";
+              rotation = 0.0;
+              type = "weather";
+              settings = {
+                background = false;
+              };
+            };
+            login = {
+              box_height = 0.0;
+              box_width = 0.0;
+              cx = 960.0;
+              cy = 700.0;
+              output = "eDP-1";
+              rotation = 0.0;
+              type = "login_box";
+            };
+          };
         };
       };
     };

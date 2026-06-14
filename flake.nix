@@ -40,6 +40,7 @@
       persistent = "/persistent";
       maindisk = "/dev/disk/by-diskseq/1";
       mainpartition = "/dev/disk/by-partlabel/disk-main-root";
+      loglevel = 0;
       gpuid = "9a49";
       resumeoffset = "8658176";
       args = {
@@ -49,6 +50,7 @@
           persistent
           maindisk
           mainpartition
+          loglevel
           gpuid
           resumeoffset
           ;

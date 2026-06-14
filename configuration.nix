@@ -36,9 +36,9 @@
     logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
   };
 
-  services.logind.settings.Login.LidSwitch = "suspend";
-  services.logind.settings.Login.HandlePowerKey = "suspend";
-  services.logind.settings.Login.PowerKeyLongPress = "poweroff";
+  # services.logind.settings.Login.LidSwitch = "suspend";
+  # services.logind.settings.Login.HandlePowerKey = "suspend";
+  # services.logind.settings.Login.PowerKeyLongPress = "poweroff";
 
   # systemd.sleep.settings.Sleep = {
   #   HibernateDelaySec = "30m";
@@ -47,25 +47,26 @@
 
   # boot.resumeDevice = config._module.args.mainpartition;
 
-  boot.consoleLogLevel = 3;
+  boot.consoleLogLevel = config._module.args.loglevel;
   boot.initrd.verbose = false;
   boot.kernelParams = [
     # Silent boot
     "quiet"
     "splash"
-    "loglevel=3"
-    "systemd.show_status=auto"
-    "rd.systemd.show_status=auto"
-    "udev.log_level=3"
-    "rd.udev.log_level=3"
-    "udev.log_priority=3"
-    "rd.udev.log_priority=3"
+    "loglevel=0"
+    "systemd.show_status=false"
+    "rd.systemd.show_status=false"
+    "udev.log_level=${toString config._module.args.loglevel}"
+    "rd.udev.log_level=${toString config._module.args.loglevel}"
+    "udev.log_priority=${toString config._module.args.loglevel}"
+    "rd.udev.log_priority=${toString config._module.args.loglevel}"
     "boot.shell_on_fail"
     # General params
     "i915.force_probe=${config._module.args.gpuid}"
     "i915.enable_guc=3"
-    "acpi_backlight=native"
+    "i915.fastboot=1"
     "i915.enable_dpcd_backlight=1"
+    "acpi_backlight=native"
     # "resume_offset=${config._module.args.resumeoffset}"
     # "mem_sleep_default=deep"
   ];

@@ -121,6 +121,8 @@ layout {
     //   together with the previously focused column.
     center-focused-column "on-overflow"
 
+    always-center-single-column
+
     // You can customize the widths that "switch-preset-column-width" (Mod+R) toggles between.
     preset-column-widths {
         // Proportion sets the width as a fraction of the output width, taking gaps into account.
@@ -129,6 +131,7 @@ layout {
         proportion 0.33333
         proportion 0.5
         proportion 0.66667
+        proportion 1.0
 
         // Fixed sets the width in logical pixels exactly.
         // fixed 1920
@@ -138,7 +141,7 @@ layout {
     // preset-window-heights { }
 
     // You can change the default width of the new windows.
-    default-column-width { proportion 0.66667; }
+    default-column-width { proportion 0.5; }
     // If you leave the brackets empty, the windows themselves will decide their initial width.
     // default-column-width {}
 
@@ -651,6 +654,10 @@ binds {
     XF86AudioMute { spawn-sh "noctalia msg volume-mute"; }
     XF86MonBrightnessUp { spawn-sh "noctalia msg brightness-up"; }
     XF86MonBrightnessDown { spawn-sh "noctalia msg brightness-down"; }
+}
+
+switch-events {
+    lid-close { spawn "noctalia msg lock-and-suspend"; }
 }
 
 window-rule {
