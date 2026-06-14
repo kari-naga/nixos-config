@@ -715,7 +715,7 @@ blur {
   saturation 1.0  // color saturation boost (default: 1.5)
 }
 
-cursor {
-    xcursor-theme "breeze_cursors"
-    xcursor-size 48
-}
+// cursor {
+//     xcursor-theme "breeze_cursors"
+//     xcursor-size 24
+// }

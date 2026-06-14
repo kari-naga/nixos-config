@@ -49,6 +49,9 @@
 
   boot.consoleLogLevel = config._module.args.loglevel;
   boot.initrd.verbose = false;
+  boot.kernel.sysctl = {
+    "kernel.printk" = "3 3 3 3";
+  };
   boot.kernelParams = [
     # Silent boot
     "quiet"

@@ -48,7 +48,7 @@
 
       bar.main = {
         auto_hide = true;
-        # reserve_space = false;
+        reserve_space = false;
         layer = "overlay";
       };
 

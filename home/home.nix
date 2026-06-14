@@ -32,6 +32,15 @@ in
 
   home.shell.enableShellIntegration = true;
 
+  home.pointerCursor = {
+    enable = true;
+    gtk.enable = true;
+    x11.enable = true;
+    size = 48;
+    package = pkgs.vanilla-dmz;
+    name = "Vanilla-DMZ-AA";
+  };
+
   xdg = {
     enable = true;
     mime.enable = true;
