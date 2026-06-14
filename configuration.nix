@@ -36,16 +36,16 @@
     logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
   };
 
-  services.logind.settings.Login.LidSwitch = "suspend-then-hibernate";
+  services.logind.settings.Login.LidSwitch = "suspend";
   services.logind.settings.Login.HandlePowerKey = "suspend";
   services.logind.settings.Login.PowerKeyLongPress = "poweroff";
 
-  systemd.sleep.settings.Sleep = {
-    HibernateDelaySec = "30m";
-    SuspendState = "mem";
-  };
+  # systemd.sleep.settings.Sleep = {
+  #   HibernateDelaySec = "30m";
+  #   SuspendState = "mem";
+  # };
 
-  boot.resumeDevice = config._module.args.mainpartition;
+  # boot.resumeDevice = config._module.args.mainpartition;
 
   boot.consoleLogLevel = 3;
   boot.initrd.verbose = false;
@@ -66,8 +66,8 @@
     "i915.enable_guc=3"
     "acpi_backlight=native"
     "i915.enable_dpcd_backlight=1"
-    "resume_offset=${config._module.args.resumeoffset}"
-    "mem_sleep_default=deep"
+    # "resume_offset=${config._module.args.resumeoffset}"
+    # "mem_sleep_default=deep"
   ];
   boot.loader.timeout = 0;
 
@@ -331,6 +331,7 @@
       "/var/lib/noctalia-greeter"
       "/var/cache"
       "/etc/NetworkManager/system-connections"
+      "/etc/tuned"
     ];
     files = [
       "/etc/machine-id"
@@ -339,7 +340,12 @@
 
   fileSystems.${config._module.args.persistent}.neededForBoot = lib.mkForce true;
 
-  swapDevices = lib.mkForce [ { device = "/.swapvol/swapfile"; } ];
+  swapDevices = lib.mkForce [
+    {
+      device = "/.swapvol/swapfile";
+      size = 32 * 1024; # 32GB in MB
+    }
+  ];
 
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
