@@ -275,8 +275,6 @@ layout {
 
 spawn-at-startup "noctalia"
 
-// spawn-at-startup "1password --silent"
-
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
     skip-at-startup
@@ -711,5 +709,5 @@ blur {
 }
 
 cursor {
-    xcursor-size 48
+    xcursor-size 32
 }
