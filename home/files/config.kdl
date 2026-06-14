@@ -709,5 +709,6 @@ blur {
 }
 
 cursor {
-    xcursor-size 32
+    xcursor-theme "breeze_cursors"
+    xcursor-size 48
 }
