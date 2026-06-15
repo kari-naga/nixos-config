@@ -36,8 +36,8 @@
     logo = "${pkgs.nixos-icons}/share/icons/hicolor/128x128/apps/nix-snowflake.png";
   };
 
-  # services.logind.settings.Login.LidSwitch = "suspend";
-  # services.logind.settings.Login.HandlePowerKey = "suspend";
+  services.logind.settings.Login.LidSwitch = "ignore";
+  services.logind.settings.Login.HandlePowerKey = "ignore";
   # services.logind.settings.Login.PowerKeyLongPress = "poweroff";
 
   # systemd.sleep.settings.Sleep = {
@@ -252,6 +252,7 @@
   # List packages installed in system profile.
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
+    noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
@@ -261,7 +262,6 @@
     e2fsprogs
     nixd
     nil
-    noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
     libheif
     libheif.out
     # Graphical Applications

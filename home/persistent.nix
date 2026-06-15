@@ -45,6 +45,7 @@
           config.xdg.userDirs.music
           config.xdg.userDirs.pictures
           config.xdg.userDirs.videos
+          config.xdg.userDirs.projects
         ];
     files = [
       ".screenrc"
