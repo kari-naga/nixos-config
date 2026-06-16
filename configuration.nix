@@ -253,37 +253,17 @@
   # You can use https://search.nixos.org/ to find more packages (and options).
   environment.systemPackages = with pkgs; [
     noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     git
     gnupg
     usbutils
     sbctl
     e2fsprogs
-    nixd
-    nil
     libheif
     libheif.out
     # Graphical Applications
     microsoft-edge
     nautilus
-    alacritty
-    # # KDE Utilities
-    # kdePackages.discover
-    # kdePackages.kcalc
-    # kdePackages.kcharselect
-    # kdePackages.kclock
-    # kdePackages.kcolorchooser
-    # kdePackages.kolourpaint
-    # kdePackages.ksystemlog
-    # kdePackages.sddm-kcm
-    # kdiff3
-    # kdePackages.isoimagewriter
-    # kdePackages.partitionmanager
-    # hardinfo2
-    # wayland-utils
-    # wl-clipboard
-    # vlc
   ];
   environment.pathsToLink = [ "share/thumbnailers" ];
 

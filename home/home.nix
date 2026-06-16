@@ -26,8 +26,13 @@ in
   };
 
   home.packages = [
-    pkgs.zed-editor
+    pkgs.alacritty
+    pkgs.fastfetch
     pkgs.helix
+    pkgs.nil
+    pkgs.nixd
+    pkgs.sublime4
+    pkgs.pkgs.zed-editor
   ];
 
   home.shell.enableShellIntegration = true;
