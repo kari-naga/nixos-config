@@ -31,7 +31,6 @@ in
     pkgs.helix
     pkgs.nil
     pkgs.nixd
-    pkgs.sublime4
     pkgs.pkgs.zed-editor
   ];
 
